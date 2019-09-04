@@ -140,8 +140,8 @@ float GetDelta()
 	return deltaTime;
 }
 
-void WindowTerminate(Window* self) {
-
+void WindowTerminate(Window* self)
+{
 	InputTerminate(self->input);
 	free(self->input);
 
