@@ -58,7 +58,6 @@ const void GLFWwindowSetIcon(GLFWwindow* window, const char* path)
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
 
 	glfwSetWindowIcon(window, 1, image);
-
 	free(image);
 }
 
