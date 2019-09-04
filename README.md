@@ -1,6 +1,6 @@
 # Insight Engine, free and OpenSource Game Framework. Using OpenGL
 ### 3D cross-platform game framework
-Insight is a **C and C++**, multiplatform game framework to create 2D games. It provides a varaity of new classes to handle different aspects like **window, input, shaders, GUI, physics...**
+Insight is a **C and C++**, multiplatform game framework to create 3D games. It provides a varaity of new classes to handle different aspects like **window, input, shaders, GUI...**
 
 Unfortunately we have not managed to port the engine to Android or HTML, nor translate it into any other language, we will try this in later versions.
 
