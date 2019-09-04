@@ -5,7 +5,7 @@ Insight is a **C and C++**, multiplatform game framework to create 3D games. It 
 Unfortunately we have not managed to port the engine to Android or HTML, nor translate it into any other language, we will try this in later versions.
 
 ### Free and open source
-Insight is completely free and open source under GNU General Public License. No strings attached, no royalties, nothing. The users' games are theirs, down to the last line of engine code. We don't want to make profit from this project.
+Insight is completely free and open source with no licence. No strings attached, no royalties, nothing. The users' games are theirs, down to the last line of engine code. We don't want to make profit from this project.
 
 ### Example code
 ```c
