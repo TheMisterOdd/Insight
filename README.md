@@ -26,7 +26,7 @@ int main(void) {
 }
 ```
 ### Output
-<img width="854" height="480" src="https://raw.githubusercontent.com/AlKiam/Insight2D/master/images/examplewindow.png" alt="window output"/>
+<img width="854" height="480" src="https://raw.githubusercontent.com/AlKiam/Insight3D/master/image/image-1.png" alt="window output"/>
 
 ## Dependencies
   * **GLFW** https://www.glfw.org/
@@ -45,6 +45,6 @@ gcc main.c -I"includes" -L"linkers" -glfw -opengl32 -glew32
 ```
 
 ##### Examples
-<img width="854" height="480" src="https://raw.githubusercontent.com/AlKiam/Insight2D/master/images/example%20game.png" alt="window output"/>
+<img width="854" height="480" src="https://raw.githubusercontent.com/AlKiam/Insight3D/master/image/image-2.png" alt="window output"/>
 
 
