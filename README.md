@@ -32,6 +32,7 @@ int main(void) {
   * **GLFW** https://www.glfw.org/
   * **OpenGL** https://glad.dav1d.de/ or http://glew.sourceforge.net/
   * **stb_image** https://github.com/nothings/stb/blob/master/stb_image.h
+  * **stb_image_write** https://github.com/nothings/stb/blob/master/stb_image_write.h
   * **cglm** https://github.com/recp/cglm
   
 ## Compilation (With GCC)
