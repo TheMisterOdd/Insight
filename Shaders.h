@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 
 typedef unsigned int Shader;
+#define ShaderBind(x) glUseProgram(x);
 
 static unsigned int new_shader(unsigned int type, const char* src)
 {
@@ -81,7 +82,4 @@ Shader mk_Shader(const char* vsPath, const char* fsPath)
 	return self;
 }
 
-const void ShaderBind(Shader self) 
-{
-	glUseProgram(self);
-}
+

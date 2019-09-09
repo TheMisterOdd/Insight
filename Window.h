@@ -42,7 +42,7 @@ typedef struct
 
 }Window;
 
-const void GLFWwindowSetCursor(GLFWwindow* window, const char* path)
+const void WindowSetCursor(GLFWwindow* window, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
@@ -52,12 +52,13 @@ const void GLFWwindowSetCursor(GLFWwindow* window, const char* path)
 	free(image);
 }
 
-const void GLFWwindowSetIcon(GLFWwindow* window, const char* path)
+const void WindowSetIcon(GLFWwindow* window, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
 
 	glfwSetWindowIcon(window, 1, image);
+
 	free(image);
 }
 
@@ -126,6 +127,8 @@ bool WindowIsRunning(Window* self)
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
 
+	InputUpdate(self->input);
+
 	glFlush();
 	glfwSwapBuffers(self->window);
 	glfwPollEvents();
@@ -140,11 +143,11 @@ float GetDelta()
 	return deltaTime;
 }
 
-void WindowTerminate(Window* self)
-{
+void WindowTerminate(Window* self) {
+
 	InputTerminate(self->input);
-	free(self->input);
 
 	glfwDestroyWindow(self->window);
 	glfwTerminate();
+	free(self);
 }

@@ -90,10 +90,8 @@ Model mk_Model()
 }
 
 void ModelDraw(Model self)
-{
-	
+{	
 	glBindVertexArray(self);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
-
 }

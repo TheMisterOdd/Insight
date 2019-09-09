@@ -43,9 +43,7 @@ typedef struct
 
 } Camera;
 
-
-
-void CameraUpdateVectors(Camera* self)
+void CameraUpdate(Camera* self)
 {
 	// Calculate the new Front vector
 	vec3 front = {
@@ -78,7 +76,7 @@ Camera* mk_Camera(vec3 position, vec3 up, float yaw, float pitch)
 	self->mouseSensitivity = SENSITIVTY;
 	self->zoom = ZOOM;
 
-	CameraUpdateVectors(self);
+	CameraUpdate(self);
 
 	return self;
 }
@@ -94,7 +92,7 @@ void CameraGetViewMatrix(Camera* self, mat4 dest)
 
 }
 
-void CameraProcessKeyboard(Camera* self, int direction, float deltaTime)
+void CameraKeyInput(Camera* self, int direction, float deltaTime)
 {
 	float velocity = self->movementSpeed * deltaTime;
 
@@ -154,7 +152,7 @@ void CameraProcessKeyboard(Camera* self, int direction, float deltaTime)
 
 }
 
-void CameraProcessMouseMovement(Camera* self, float xOffset, float yOffset, float deltaTime, bool constrainPitch)
+void CameraMouseInput(Camera* self, float xOffset, float yOffset, float deltaTime, bool constrainPitch)
 {
 	
 	xOffset *= self->mouseSensitivity ;
@@ -178,10 +176,10 @@ void CameraProcessMouseMovement(Camera* self, float xOffset, float yOffset, floa
 	}
 
 	// Update Front, Right and Up Vectors using the updated Eular angles
-	CameraUpdateVectors(self);
+	CameraUpdate(self);
 }
 
-void CameraProcessMouseScroll(Camera* self, float yOffset)
+void CameraScrollInput(Camera* self, float yOffset)
 {
 	if (self->zoom >= 1.0f && self->zoom <= 45.0f)
 	{

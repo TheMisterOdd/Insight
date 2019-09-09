@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <time.h>
 
 #ifndef STB_IMAGE_IMPLEMENTATION
 
@@ -14,14 +15,19 @@
 
 #endif 
 
+#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
+	#define STB_IMAGE_WRITE_IMPLEMENTATION
+	#include <stb_image_writer.h>
+#endif
+
+
+
 typedef struct  
 {
-	int width, height;
+	int width, height, channels;
 	unsigned int texture;
 
 }Texture;
-
-typedef unsigned char* Image;
 
 Texture* mk_Texture(const char * path, bool antialias)
 {
@@ -29,7 +35,7 @@ Texture* mk_Texture(const char * path, bool antialias)
 	Texture* self = (Texture*)malloc(sizeof(Texture));
 
 	glGenTextures(1, &self->texture);
-	Image img = stbi_load(path, &self->width, &self->height, NULL, STBI_rgb_alpha);
+	unsigned char* img = stbi_load(path, &self->width, &self->height, &self->channels, STBI_rgb_alpha);
 
 	if (img == NULL)
 	{
@@ -56,4 +62,22 @@ void TextureBind(Texture* self, unsigned int sampler)
 {
 	glActiveTexture(GL_TEXTURE0 + sampler);
 	glBindTexture(GL_TEXTURE_2D, self->texture);
+}
+
+void Screenshoot(Window* window) 
+{
+	printf("\n[Time: %.1f] Screenshot Taken\n", glfwGetTime());
+
+	int n = 3 * window->width * window->height;
+	unsigned char* pixels = (unsigned char*)malloc(sizeof(unsigned char) * n);
+
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+	glReadPixels(0, 0, window->width, window->height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	if (GL_NO_ERROR != glGetError()) fputs("Error: Unable to read pixels.", stderr);
+
+	stbi_write_png("screenshot.png", window->width, window->height, 3, pixels, 3 * window->width);
+
+	// Free resources
+	free(pixels);
 }

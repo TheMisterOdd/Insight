@@ -82,4 +82,5 @@ void InputTerminate(Input* self)
 {
 	free(self->keys);
 	free(self->mouseButtons);
+	free(self);
 }
