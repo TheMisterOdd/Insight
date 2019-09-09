@@ -47,4 +47,6 @@ gcc main.c -I"includes" -L"linkers" -glfw -opengl32 -glew32
 ##### Examples
 <img width="854" height="480" src="https://raw.githubusercontent.com/AlKiam/Insight3D/master/image/image-2.png" alt="window output"/>
 
+<img width="854" height="480" src="https://raw.githubusercontent.com/AlKiam/Insight3D/master/image/image-3.png" alt="window output"/>
+
 
