@@ -38,11 +38,11 @@ int main(void) {
 ## Compilation (With GCC)
 **If you are using GLAD**
 ```cmd
-gcc main.c glad.c -I[includes] -L[linkers] -glfw -opengl32
+gcc main.c glad.c -I[path to the includes] -L[path to the linkers] -glfw -opengl32
 ```
 **If you are using GLEW**
 ```
-gcc main.c -I[includes] -L[linkers] -glfw -opengl32 -glew32
+gcc main.c -I[path to the includes] -L[path to the linkers] -glfw -opengl32 -glew32
 ```
 
 ##### Examples
