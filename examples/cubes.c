@@ -1,7 +1,5 @@
 #pragma once
 
-#define _CRT_SECURE_NO_WARNINGS
-
 #include "Window.h"
 #include "Shaders.h"
 #include "Model.h"
