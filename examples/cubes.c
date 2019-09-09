@@ -1,9 +1,12 @@
 #pragma once
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "Window.h"
 #include "Shaders.h"
 #include "Model.h"
 #include "Camera.h"
+#include "Texture.h"
 
 Camera* camera = NULL;
 
@@ -11,13 +14,13 @@ Shader Lighting, Lamp;
 Model model;
 
 mat4 projection = GLM_MAT4_IDENTITY_INIT;
-mat4 object     = GLM_MAT4_IDENTITY_INIT;
-mat4 view       = GLM_MAT4_IDENTITY_INIT;
+mat4 object = GLM_MAT4_IDENTITY_INIT;
+mat4 view = GLM_MAT4_IDENTITY_INIT;
 
 float lastX = 0.0f, lastY = 0.0f;
 bool firstMouse = true, GL_POLY = false;
 
-void keyboard_manager(Window* window) 
+void keyboard_manager(Window* window)
 {
 	if (InputIsKeyDown(window->input, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(window->window, GLFW_TRUE);
@@ -57,40 +60,44 @@ void keyboard_manager(Window* window)
 		Screenshoot(window);
 	}
 
-	if (InputIsKeyPressed(window->input, GLFW_KEY_F3) && !GL_POLY) 
+	if (InputIsKeyPressed(window->input, GLFW_KEY_F3) && !GL_POLY)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		GL_POLY = true;
 	}
-	else if (InputIsKeyPressed(window->input, GLFW_KEY_F3) && GL_POLY) 
+	else if (InputIsKeyPressed(window->input, GLFW_KEY_F3) && GL_POLY)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		GL_POLY = false;
 	}
 
 	printf(
-		"\rDisplay[%d, %d], frames: %.0f, %.1fms\t", window->width, window->height, 1/GetDelta(), GetDelta() * 1000
+		"\rDisplay[%d, %d], frames: %.0f, %.1fms\t", window->width, window->height, 1 / GetDelta(), GetDelta() * 1000
 	);
 
 }
-void var_init(Window* window) 
+void var_init(Window* window)
 {
 	WindowSetCursor(window->window, "assests/cursor.png");
 	WindowSetIcon(window->window, "assests/icon.png");
-	
+
 	Lighting = mk_Shader("assests/shaders/lighting.vs", "assests/shaders/lighting.fs");
 	Lamp = mk_Shader("assests/shaders/lamp.vs", "assests/shaders/lamp.fs");
 
-	model = mk_Model();	
+	model = mk_Model();
 
 	camera = mk_Camera(
-		(vec3) {0.0f, 0.0f, 3.0f},
-		(vec3) {0.0f, 1.0f, 0.0f},
-		YAW,
-		PITCH
-	);
+		(vec3) {
+		0.0f, 0.0f, 3.0f
+	},
+		(vec3) {
+		0.0f, 1.0f, 0.0f
+	},
+			YAW,
+			PITCH
+			);
 
-	glm_perspective(camera->zoom, (float)window->width/(float)window->height, -1.f, 100.0f, projection);
+	glm_perspective(camera->zoom, (float)window->width / (float)window->height, -1.f, 100.0f, projection);
 
 }
 
@@ -138,11 +145,11 @@ int main(void)
 
 			ModelDraw(model);
 			glUseProgram(0);
-			
-			
+
+
 			glm_translate_make(object, (vec3) { 1.2f, 1.0f, 2.0f });
 			glm_scale(object, (vec3) { .5f, .5f, .5f });
-			
+
 			// Binding the second shader
 			ShaderBind(Lamp);
 
@@ -162,10 +169,8 @@ int main(void)
 	// deleting memory
 	{
 		WindowTerminate(window);
-		free(texture);
 		free(camera);
 	}
 
 	return 0;
 }
-
