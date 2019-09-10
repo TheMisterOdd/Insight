@@ -1,10 +1,6 @@
-#pragma once
-
-// GL Includes
 #include <glad/glad.h>
 #include <math.h>
 #include <cglm.h>
-
 
 // Default camera values
 const float YAW = -90.0f;
