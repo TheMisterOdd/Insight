@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Window.h"
 #include <cglm.h>
 
