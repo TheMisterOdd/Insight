@@ -64,7 +64,7 @@ void TextureBind(Texture* self, unsigned int sampler)
 	glBindTexture(GL_TEXTURE_2D, self->texture);
 }
 
-void Screenshoot(Window* window) 
+void Screenshot(Window* window) 
 {
 	printf("\n[Time: %.1f] Screenshot Taken\n", glfwGetTime());
 
