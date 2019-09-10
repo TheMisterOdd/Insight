@@ -10,7 +10,7 @@ int main(void) {
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 		
-		if (Screenshoot(window)) // Take an screenshoot from the buffer and checks if it was succesfully taken
+		if (Screenshot(window)) // Take an screenshoot from the buffer and checks if it was succesfully taken
 			break; // if the screenshot was success, breaks the loop
 	}
     
