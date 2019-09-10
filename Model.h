@@ -1,5 +1,3 @@
-#pragma once
-
 #include <stdlib.h>
 #include <glad/glad.h>
 
@@ -11,8 +9,8 @@ Model mk_Model()
 	/*float vertices[] = 
 	{
 		// Positions			// Color				// TexCoords
-		1.0f,  1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		1.0f,  1.0f,	// 0
-		1.0f, -1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		1.0f,  0.0f,	// 1
+	    1.0f,  1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		1.0f,  1.0f,	// 0
+	    1.0f, -1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		1.0f,  0.0f,	// 1
 	   -1.0f, -1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		0.0f,  0.0f,	// 2	
 	   -1.0f,  1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		0.0f,  1.0f		// 3
 
