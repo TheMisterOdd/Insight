@@ -143,7 +143,8 @@ void WindowSetSize(Window* self, int width, int height)
 	glfwSetWindowPos(self->window, (self->vidMode->width - width) / 2, (self->vidMode->height - height) / 2);
 }
 
-void WindowTerminate(Window* self) {
+void WindowTerminate(Window* self) 
+{
 
 	InputTerminate(self->input);
 
