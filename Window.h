@@ -17,8 +17,6 @@
 
 #endif
 
-#define len(x) (sizeof(x) / sizeof(*x))
-
 static float deltaTime = 0.0f, lastTime = 0.0f;
 
 static void __GLFWwindowResizeCallback(GLFWwindow* window, int fbW, int fbH)
