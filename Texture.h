@@ -1,26 +1,21 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#pragma once
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <time.h>
+#include "Window.h"
+
 
 #ifndef STB_IMAGE_IMPLEMENTATION
 
 	#define STB_IMAGE_IMPLEMENTATION
 	#include <stb_image.h>
 
-#endif 
+#endif
 
 #ifndef STB_IMAGE_WRITE_IMPLEMENTATION
 	#define STB_IMAGE_WRITE_IMPLEMENTATION
-	#include <stb_image_writer.h>
+	#include <stb_image_write.h>
 #endif
 
-
-
-typedef struct  
+typedef struct
 {
 	int width, height, channels;
 	unsigned int texture;
@@ -29,16 +24,21 @@ typedef struct
 
 Texture* mk_Texture(const char * path, bool antialias)
 {
-	
+
 	Texture* self = (Texture*)malloc(sizeof(Texture));
 
 	glGenTextures(1, &self->texture);
 	unsigned char* img = stbi_load(path, &self->width, &self->height, &self->channels, STBI_rgb_alpha);
 
-	if (img == NULL)
+	if (!img)
 	{
-		fprintf(stderr, "Error: %s: %s\n", path, strerror(errno)); 
-		exit(-1);
+		char* err = (char*)malloc(sizeof(char) * 128);
+		strerror_s(err, 128, errno);
+
+		fprintf(stderr, "Error: %s: %s\n", path, err);
+		free(err);
+
+		return NULL;
 	}
 
 	glBindTexture(GL_TEXTURE_2D, self->texture);
@@ -56,26 +56,72 @@ Texture* mk_Texture(const char * path, bool antialias)
 	return self;
 }
 
+Texture* mk_TextureSkyBox(const char** faces_files, unsigned int lenght)
+{
+	Texture* self = (Texture*)malloc(sizeof(Texture));
+
+	glGenTextures(1, &self->texture);
+
+	unsigned char *img = 0;
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, self->texture);
+
+	for (unsigned int i = 0; i < lenght; i++)
+	{
+		img = stbi_load(faces_files[i], &self->width, &self->height, &self->channels, STBI_rgb);
+		if (!img)
+		{
+			char* err = (char*)malloc(sizeof(char) * 128);
+			strerror_s(err, 128, errno);
+
+			fprintf(stderr, "Error: %s: %s\n", faces_files[i], err);
+			free(err);
+
+			return 0;
+		}
+
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, self->width, self->height, 0, GL_RGB, GL_UNSIGNED_BYTE, img);
+		stbi_image_free(img);
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+	return self;
+}
+
 void TextureBind(Texture* self, unsigned int sampler)
 {
 	glActiveTexture(GL_TEXTURE0 + sampler);
 	glBindTexture(GL_TEXTURE_2D, self->texture);
 }
 
-void Screenshot(Window* window) 
+bool Screenshoot(Window* window)
 {
-	printf("\n[Time: %.1f] Screenshot Taken\n", glfwGetTime());
-
 	int n = 3 * window->width * window->height;
 	unsigned char* pixels = (unsigned char*)malloc(sizeof(unsigned char) * n);
 
+	glClipControl(GL_UPPER_LEFT, 1);
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
 	glReadPixels(0, 0, window->width, window->height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-	if (GL_NO_ERROR != glGetError()) fputs("Error: Unable to read pixels.", stderr);
+	if (pixels == NULL)
+	{
+		fputs("Error: Unable to read pixels.", stderr);
+		return false;
+	}
 
-	stbi_write_png("screenshot.png", window->width, window->height, 3, pixels, 3 * window->width);
+	char* outfile = (char*)malloc(sizeof(char) * 128);
+	sprintf_s(outfile, 128, "screenshot_%lf.png", glfwGetTime());
+	stbi_write_png(outfile, window->width, window->height, 3, pixels, 3 * window->width);
+	free(outfile);
 
 	// Free resources
-	free(pixels);
+	stbi_image_free(pixels);
+
+	return true; // return true if the screenshot was success
 }

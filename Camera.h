@@ -1,12 +1,16 @@
+#pragma once
+
+// GL Includes
 #include <glad/glad.h>
 #include <math.h>
 #include <cglm.h>
+
 
 // Default camera values
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
 const float SPEED = 10.0f;
-const float SENSITIVTY = 0.025f;
+const float SENSITIVTY = 0.15f;
 const float ZOOM = 45.0f;
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
@@ -20,7 +24,7 @@ enum
 	DOWN
 };
 
-typedef struct 
+typedef struct
 {
 	vec3 position;
 	vec3 front;
@@ -47,8 +51,8 @@ void CameraUpdate(Camera* self)
 		(float)(sin(glm_rad(self->pitch))),
 		(float)(sin(glm_rad(self->yaw)) * cos(glm_rad(self->pitch)))
 	};
-	
-	//glm_normalize_to(front, self->front);
+
+	glm_normalize_to(front, self->front);
 
 	glm_cross(self->front, self->worldUp, front);
 	glm_normalize_to(front, self->right);
@@ -57,7 +61,7 @@ void CameraUpdate(Camera* self)
 	glm_normalize_to(front, self->up);
 }
 
-Camera* mk_Camera(vec3 position, vec3 up, float yaw, float pitch) 
+Camera* mk_Camera(vec3 position, vec3 up, float yaw, float pitch, float sensitivity)
 {
 	Camera* self = (Camera*)malloc(sizeof(Camera));
 
@@ -69,7 +73,7 @@ Camera* mk_Camera(vec3 position, vec3 up, float yaw, float pitch)
 	self->pitch = pitch;
 
 	self->movementSpeed = SPEED;
-	self->mouseSensitivity = SENSITIVTY;
+	self->mouseSensitivity = sensitivity;
 	self->zoom = ZOOM;
 
 	CameraUpdate(self);
@@ -77,7 +81,7 @@ Camera* mk_Camera(vec3 position, vec3 up, float yaw, float pitch)
 	return self;
 }
 
-void CameraGetViewMatrix(Camera* self, mat4 dest) 
+void CameraGetViewMatrix(Camera* self, mat4 dest)
 {
 	glm_lookat(
 		self->position,
@@ -150,7 +154,7 @@ void CameraKeyInput(Camera* self, int direction, float deltaTime)
 
 void CameraMouseInput(Camera* self, float xOffset, float yOffset, float deltaTime, bool constrainPitch)
 {
-	
+
 	xOffset *= self->mouseSensitivity ;
 	yOffset *= self->mouseSensitivity ;
 

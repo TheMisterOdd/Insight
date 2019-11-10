@@ -1,7 +1,8 @@
-#include "Window.h"
-#include <cglm.h>
+#pragma once
 
-typedef struct 
+#include "Window.h"
+
+typedef struct
 {
 	GLFWwindow* window;
 	bool* keys;
@@ -9,7 +10,7 @@ typedef struct
 
 }Input;
 
-Input* mk_Input(GLFWwindow* window) 
+Input* mk_Input(GLFWwindow* window)
 {
 	Input* self = (Input*)malloc(sizeof(Input));
 
@@ -52,12 +53,12 @@ bool InputIsMouseButtonReleased(Input* self, int button)
 
 void InputUpdate(Input* self)
 {
-	for (int i = 32; i < GLFW_KEY_LAST; i++) 
+	for (int i = 32; i < GLFW_KEY_LAST; i++)
 	{
 		self->keys[i] = InputIsKeyDown(self, i);
 	}
 
-	for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++) 
+	for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++)
 	{
 		self->mouseButtons[i] = InputIsMouseButtonDown(self, i);
 	}
@@ -76,7 +77,7 @@ double* InputGetMousePos(Input* self)
 	return position;
 }
 
-void InputTerminate(Input* self) 
+void InputTerminate(Input* self)
 {
 	free(self->keys);
 	free(self->mouseButtons);
