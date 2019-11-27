@@ -7,9 +7,8 @@ typedef unsigned int Model;
 
 #define MODEL_SIZE 1.f
 
-Model mk_Model() 
+Model NewModel() 
 {
-
 	float vertices[] =
 	{
 		-MODEL_SIZE, -MODEL_SIZE, -MODEL_SIZE,  0.0f,  0.0f, -1.0f,
@@ -55,7 +54,6 @@ Model mk_Model()
 		-MODEL_SIZE,  MODEL_SIZE, -MODEL_SIZE,  0.0f,  1.0f,  0.0f
 	};
 
-
 	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -84,7 +82,7 @@ void ModelDraw(Model self)
 	glBindVertexArray(0);
 }
 
-Model mk_ModelSkybox()
+Model NewModelSkyBox()
 {
 	float vertices[] =
 	{

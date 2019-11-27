@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <errno.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -10,11 +11,11 @@
 #include "Input.h"
 
 #ifndef STB_IMAGE_IMPLEMENTATION
-
-	#define STB_IMAGE_IMPLEMENTATION
-	#include <stb_image.h>
-
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #endif
+
+#define len(x) (sizeof(x) / sizeof(*x))
 
 static float deltaTime = 0.0f, lastTime = 0.0f;
 
@@ -59,7 +60,18 @@ void WindowSetIcon(GLFWwindow* window, const char* path)
 	free(image);
 }
 
-Window* mk_Window(int width, int height, const char* title, bool fullscreen)
+/*! @brief Creates a new window with its context.
+ *
+ *  @param[in] width Defines the window width.
+ *  @param[in] heigth Defines the window height.
+ *  @param[in] tile Defines the window title.
+ *  @param[in] fullscreen Defines if the is going to be fullscreen or not.
+
+ *  @return The allocated window.
+ *
+ *  @errors Context could not be created
+ */
+Window* NewWindow(int width, int height, const char* title, bool fullscreen)
 {
 	Window* self = (Window*)malloc(sizeof(Window));
 	self->width = width;
@@ -71,6 +83,10 @@ Window* mk_Window(int width, int height, const char* title, bool fullscreen)
 		fprintf(stderr, "Could not create a GLFW context\n");
 		return NULL;
 	}
+	
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_SAMPLES, 8);
 
 	self->window = glfwCreateWindow(self->width, self->height, title, self->fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL);
 
@@ -86,7 +102,7 @@ Window* mk_Window(int width, int height, const char* title, bool fullscreen)
 	glfwSetErrorCallback(__GLFWwindowErrCallback);
 
 	glfwGetFramebufferSize(self->window, &self->width, &self->height);
-	self->input = mk_Input(self->window);
+	self->input = NewInput(self->window);
 
 	glfwMakeContextCurrent(self->window);
 	if (!gladLoadGL())
@@ -116,6 +132,12 @@ Window* mk_Window(int width, int height, const char* title, bool fullscreen)
 	return self;
 }
 
+/*! @brief Checks if the window is running and doesn't need to be closed.
+ *
+ *  @param[in] self Is the window that is going to be used in the function.
+ *
+ *  @return If the window is running or not.
+ */
 bool WindowIsRunning(Window* self)
 {
 	return !glfwWindowShouldClose(self->window);
@@ -142,8 +164,7 @@ void WindowSetSize(Window* self, int width, int height)
 	glfwSetWindowPos(self->window, (self->vidMode->width - width) / 2, (self->vidMode->height - height) / 2);
 }
 
-void WindowTerminate(Window* self) 
-{
+void WindowTerminate(Window* self) {
 
 	InputTerminate(self->input);
 

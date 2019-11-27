@@ -2,9 +2,7 @@
 
 // GL Includes
 #include <glad/glad.h>
-#include <math.h>
 #include <cglm.h>
-
 
 // Default camera values
 const float YAW = -90.0f;
@@ -14,15 +12,12 @@ const float SENSITIVTY = 0.15f;
 const float ZOOM = 45.0f;
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
-enum
-{
-	FORWARD,
-	BACKWARD,
-	LEFT,
-	RIGHT,
-	UP,
-	DOWN
-};
+#define FORWARD 0
+#define BACKWARD 1
+#define LEFT 2
+#define RIGHT 3
+#define UP 4
+#define DOWN 5 
 
 typedef struct
 {
@@ -61,7 +56,7 @@ void CameraUpdate(Camera* self)
 	glm_normalize_to(front, self->up);
 }
 
-Camera* mk_Camera(vec3 position, vec3 up, float yaw, float pitch, float sensitivity)
+Camera* NewCamera(vec3 position, vec3 up, float yaw, float pitch, float sensitivity)
 {
 	Camera* self = (Camera*)malloc(sizeof(Camera));
 

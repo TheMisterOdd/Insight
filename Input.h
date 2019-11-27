@@ -10,7 +10,7 @@ typedef struct
 
 }Input;
 
-Input* mk_Input(GLFWwindow* window)
+Input* NewInput(GLFWwindow* window)
 {
 	Input* self = (Input*)malloc(sizeof(Input));
 

@@ -66,7 +66,7 @@ static char* read_file(const char* path)
 	return buffer;
 }
 
-Shader mk_Shader(const char* vsPath, const char* fsPath)
+Shader NewShader(const char* vsPath, const char* fsPath)
 {
 	Shader self;
 	self = glCreateProgram();

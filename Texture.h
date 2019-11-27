@@ -2,29 +2,24 @@
 
 #include "Window.h"
 
-
 #ifndef STB_IMAGE_IMPLEMENTATION
-
-	#define STB_IMAGE_IMPLEMENTATION
-	#include <stb_image.h>
-
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #endif
 
 #ifndef STB_IMAGE_WRITE_IMPLEMENTATION
-	#define STB_IMAGE_WRITE_IMPLEMENTATION
-	#include <stb_image_write.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
 #endif
 
 typedef struct
 {
 	int width, height, channels;
 	unsigned int texture;
-
 }Texture;
 
-Texture* mk_Texture(const char * path, bool antialias)
+Texture* NewTexture(const char* path, bool antialias)
 {
-
 	Texture* self = (Texture*)malloc(sizeof(Texture));
 
 	glGenTextures(1, &self->texture);
@@ -56,14 +51,12 @@ Texture* mk_Texture(const char * path, bool antialias)
 	return self;
 }
 
-Texture* mk_TextureSkyBox(const char** faces_files, unsigned int lenght)
+Texture* NewTextureSkyBox(const char** faces_files, unsigned int lenght)
 {
 	Texture* self = (Texture*)malloc(sizeof(Texture));
+	unsigned char* img = 0;
 
 	glGenTextures(1, &self->texture);
-
-	unsigned char *img = 0;
-
 	glBindTexture(GL_TEXTURE_CUBE_MAP, self->texture);
 
 	for (unsigned int i = 0; i < lenght; i++)
