@@ -50,4 +50,6 @@ gcc main.c -I[path to the includes] -L[path to the linkers] -glfw -opengl32 -gle
 
 <img width="854" height="480" src="https://raw.githubusercontent.com/AlKiam/Insight3D/master/image/image-3.png" alt="window output"/>
 
+<img width="854" height="480" src="https://raw.githubusercontent.com/AlKiam/Insight3D/master/image/waves.png" alt="window output"/>
+
 
