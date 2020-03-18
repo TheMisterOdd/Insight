@@ -3,12 +3,20 @@
 #include <stdlib.h>
 #include <glad/glad.h>
 
-typedef unsigned int Model;
+typedef struct 
+{
+	unsigned int Data, SupplyData;
+} Model;
 
 #define MODEL_SIZE 1.f
 
-Model NewModel() 
+Model* NewModel3D() 
 {
+	Model* self = (Model*)malloc(sizeof(Model));
+	if (!self)
+		return NULL;
+
+	printf("Loading new model...\n");
 	float vertices[] =
 	{
 		-MODEL_SIZE, -MODEL_SIZE, -MODEL_SIZE,  0.0f,  0.0f, -1.0f,
@@ -54,13 +62,12 @@ Model NewModel()
 		-MODEL_SIZE,  MODEL_SIZE, -MODEL_SIZE,  0.0f,  1.0f,  0.0f
 	};
 
-	unsigned int VBO, VAO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
+	glGenVertexArrays(1, &self->Data);
+	glGenBuffers(1, &self->SupplyData);
 
-	glBindVertexArray(VAO);
+	glBindVertexArray(self->Data);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, self->SupplyData);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	// Position attribute
@@ -70,79 +77,77 @@ Model NewModel()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0); // Unbind VAO
-
-	return VAO;
+	
+	return self;
 }
 
-void ModelDraw(Model self)
-{	
-	glBindVertexArray(self);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
-}
-
-Model NewModelSkyBox()
+Model* NewModel2D() 
 {
+	printf("Loading new model...\n");
+	Model* self = (Model*)malloc(sizeof(Model));
+
+	if (!self)
+		return NULL;
+
 	float vertices[] =
 	{
-		// Positions
-		-1.f,  1.f, -1.f,
-		-1.f, -1.f, -1.f,
-		 1.f, -1.f, -1.f,
-		 1.f, -1.f, -1.f,
-		 1.f,  1.f, -1.f,
-		-1.f,  1.f, -1.f,
-		    	 	 
-		-1.f, -1.f,  1.f,
-		-1.f, -1.f, -1.f,
-		-1.f,  1.f, -1.f,
-		-1.f,  1.f, -1.f,
-		-1.f,  1.f,  1.f,
-		-1.f, -1.f,  1.f,
-		    	 	 
-		 1.f, -1.f, -1.f,
-		 1.f, -1.f,  1.f,
-		 1.f,  1.f,  1.f,
-		 1.f,  1.f,  1.f,
-		 1.f,  1.f, -1.f,
-		 1.f, -1.f, -1.f,
-		    	 	 
-		-1.f, -1.f,  1.f,
-		-1.f,  1.f,  1.f,
-		 1.f,  1.f,  1.f,
-		 1.f,  1.f,  1.f,
-		 1.f, -1.f,  1.f,
-		-1.f, -1.f,  1.f,
-		    	 	 
-		-1.f,  1.f, -1.f,
-		 1.f,  1.f, -1.f,
-		 1.f,  1.f,  1.f,
-		 1.f,  1.f,  1.f,
-		-1.f,  1.f,  1.f,
-		-1.f,  1.f, -1.f,
-		    	 	 
-		-1.f, -1.f, -1.f,
-		-1.f, -1.f,  1.f,
-		 1.f, -1.f, -1.f,
-		 1.f, -1.f, -1.f,
-		-1.f, -1.f,  1.f,
-		 1.f, -1.f,  1.f
+		// Positions			// Color				// TexCoords
+		1.0f,  1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		1.0f,  1.0f,	// 0
+		1.0f, -1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		1.0f,  0.0f,	// 1
+	   -1.0f, -1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		0.0f,  0.0f,	// 2	
+	   -1.0f,  1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		0.0f,  1.0f		// 3
+
+	};
+	unsigned int indices[] =
+	{
+		0, 1, 3,
+		1, 2, 3
 	};
 
-	unsigned int VAO, VBO;
+	glGenBuffers(1, &self->Data);
+	glGenBuffers(1, &self->SupplyData);
 
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, self->Data);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->SupplyData);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3 * sizeof(float)));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	return self;
+}
+
+void ModelDraw(Model* self, int count)
+{	
+	glBindVertexArray(self->Data);
+	glDrawArrays(GL_TRIANGLES, 0, count);
 	glBindVertexArray(0);
-	
-	return VAO;
+}
+
+void ModelDrawWithEBOs(Model* self, int count) 
+{
+	glBindBuffer(GL_ARRAY_BUFFER, self->Data);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->SupplyData);
+	glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, NULL);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void ModelTerminate(Model* self) 
+{
+	glDeleteBuffers(1, &self->Data);
+	glDeleteBuffers(1, &self->SupplyData);
+	free(self);
 }
