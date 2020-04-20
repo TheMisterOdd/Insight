@@ -46,7 +46,7 @@ Player* mk_Player(int health, int scale, vec3 start_pos) {
 
 	Player* self = (Player*)malloc(sizeof(Player));
 
-	self->model = mk_Model(); // new Model
+	self->model = mk_Model(); // make a new Model
 
 	self->health = health;
 	self->scale = scale;
