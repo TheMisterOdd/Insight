@@ -6,14 +6,14 @@
 #include "Animation.h"
 #include "AABB.h"
 
-static float glm_vec3_squared_len(vec3 vector)
+static float glm_vec3_squared_len(vec3 a)
 {
-	return (vector[0] * vector[0]) + (vector[1] * vector[1]) + (vector[2] * vector[2]);
+	return (a[0] * a[0]) + (a[1] * a[1]) + (a[2] * a[2]);
 }
 
-static float glm_vec3_len(vec3 vector)
+static float glm_vec3_len(vec3 a)
 {
-	return (float)sqrt(glm_vec3_squared_len(vector));
+	return (float)sqrt(glm_vec3_squared_len(a));
 }
 
 typedef struct {
