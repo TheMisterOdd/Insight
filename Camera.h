@@ -56,8 +56,9 @@ void CameraUpdate(Camera* self)
 	glm_normalize_to(front, self->up);
 }
 
-Camera* NewCamera(vec3 position, vec3 up, float yaw, float pitch, float sensitivity)
+Camera* mk_Camera(vec3 position, vec3 up, float yaw, float pitch, float sensitivity)
 {
+	printf("Loading camera...\n");
 	Camera* self = (Camera*)malloc(sizeof(Camera));
 
 	glm_vec3_copy(position, self->position);
@@ -150,8 +151,8 @@ void CameraKeyInput(Camera* self, int direction, float deltaTime)
 void CameraMouseInput(Camera* self, float xOffset, float yOffset, float deltaTime, bool constrainPitch)
 {
 
-	xOffset *= self->mouseSensitivity ;
-	yOffset *= self->mouseSensitivity ;
+	xOffset *= self->mouseSensitivity;
+	yOffset *= self->mouseSensitivity;
 
 	self->yaw += xOffset;
 	self->pitch += yOffset;

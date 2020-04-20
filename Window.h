@@ -1,9 +1,7 @@
 #pragma once
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <errno.h>
+#include <malloc.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -18,6 +16,7 @@
 #define len(x) (sizeof(x) / sizeof(*x))
 
 static float deltaTime = 0.0f, lastTime = 0.0f;
+char* CPU_Info;
 
 static void __GLFWwindowResizeCallback(GLFWwindow* window, int fbW, int fbH)
 {
@@ -26,78 +25,130 @@ static void __GLFWwindowResizeCallback(GLFWwindow* window, int fbW, int fbH)
 
 static void __GLFWwindowErrCallback(int err, const char* description)
 {
-	fprintf(stderr, "ERROR: %s\n", description);
+	printf("ERROR: %s\n", description);
 }
 
 typedef struct
 {
-	int width, height;
-	bool fullscreen;
+	int width, height, fullscreen;
 
 	GLFWwindow* window;
 	GLFWvidmode* vidMode;
 	Input* input;
 
-}Window;
+} InsightWindow;
 
-void WindowSetCursor(GLFWwindow* window, const char* path)
+/*! @brief Sets a window cursor
+ *
+ *  @param[in] window is the window that is going to be used for setting the icon.
+ *  @param[in] path the source where the image is found.
+ *
+ *  @errors Window cursor could not be setted
+ */
+void WindowSetCursor(InsightWindow* window, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
 	GLFWcursor* cursor = glfwCreateCursor(image, 0, 0);
 
-	glfwSetCursor(window, cursor);
+	glfwSetCursor(window->window, cursor);
 	free(image);
 }
 
-void WindowSetIcon(GLFWwindow* window, const char* path)
+/*! @brief Sets a window icon
+ *
+ *  @param[in] window is the window that is going to be used for setting the icon.
+ *  @param[in] path the source where the image is found.
+ *
+ *  @errors Window icon could not be setted
+ */
+void WindowSetIcon(InsightWindow* window, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
-
-	glfwSetWindowIcon(window, 1, image);
+	glfwSetWindowIcon(window->window, 1, image);
 
 	free(image);
+}
+
+/*! @brief return the CPU name
+ *
+ *  @errors the char array could not be correctly allocated
+ */
+static void WindowGetSystemInfo() 
+{
+	int CPUInfo[4] = { -1 };
+	unsigned   nExIds, i = 0;
+	char* CPUBrandString = (char*)malloc(sizeof(char) * 0x40);
+
+	// Get the information associated with each extended ID.
+	__cpuid(CPUInfo, 0x80000000);
+	nExIds = CPUInfo[0];
+	for (i = 0x80000000; i <= nExIds; ++i)
+	{
+		__cpuid(CPUInfo, i);
+		// Interpret CPU brand string
+		if (i == 0x80000002)
+			memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+		else if (i == 0x80000003)
+			memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+		else if (i == 0x80000004)
+			memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+	}
+	memcpy(&CPU_Info, &CPUBrandString, sizeof(char**));
+
+}
+
+void InsightInit() 
+{
+	if (!glfwInit())  // init glfw
+	{
+		printf("Could not create a GLFW context\n");
+		exit(-1);
+	}
+	WindowGetSystemInfo();
 }
 
 /*! @brief Creates a new window with its context.
  *
  *  @param[in] width Defines the window width.
  *  @param[in] heigth Defines the window height.
- *  @param[in] tile Defines the window title.
- *  @param[in] fullscreen Defines if the is going to be fullscreen or not.
-
+ *  @param[in] title Defines the window title.
+ *  @param[in] fullscreen Defines if the window is going to be fullscreen or not.
+ *
  *  @return The allocated window.
  *
  *  @errors Context could not be created
  */
-Window* NewWindow(int width, int height, const char* title, bool fullscreen)
+InsightWindow* mk_Window(int width, int height, const char* title, int fullscreen)
 {
-	Window* self = (Window*)malloc(sizeof(Window));
+	InsightWindow* self = (InsightWindow*)malloc(sizeof(InsightWindow));
 	self->width = width;
 	self->height = height;
 	self->fullscreen = fullscreen;
+	self->vidMode = (GLFWvidmode*)glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-	if (!glfwInit())  // init glfw
-	{
-		fprintf(stderr, "Could not create a GLFW context\n");
-		return NULL;
-	}
-	
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	printf("Loading Window...\n");
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_SAMPLES, 8);
+
+	if (self->width == self->vidMode->width && self->height == self->vidMode->height)
+		glfwWindowHint(GLFW_DECORATED, GL_FALSE);
 
 	self->window = glfwCreateWindow(self->width, self->height, title, self->fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL);
 
 	if (self->window == NULL)
 	{
-		fprintf(stderr, "Could not create a GLFW window context\n");
+		printf("Could not create a GLFW window context\n");
 		return NULL;
 	}
-	self->vidMode = (GLFWvidmode*)glfwGetVideoMode(glfwGetPrimaryMonitor());
+	
 	glfwSetWindowPos(self->window, (self->vidMode->width - self->width) / 2, (self->vidMode->height - self->height) / 2);
-
+	glfwSetWindowSizeLimits(self->window, 854, 480, self->vidMode->width, self->vidMode->height);
 	glfwSetWindowSizeCallback(self->window, __GLFWwindowResizeCallback);
 	glfwSetErrorCallback(__GLFWwindowErrCallback);
 
@@ -120,17 +171,28 @@ Window* NewWindow(int width, int height, const char* title, bool fullscreen)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LESS);
 
-	// Printing useful information of the APIs
-	printf("OpenGL %s\n", glGetString(GL_VERSION));
-	printf("GLFW %s\n", glfwGetVersionString());
-
-	// Printing useful hardware specs
-	printf("%s\n", glGetString(GL_VENDOR));
-	printf("%s\n", glGetString(GL_RENDERER));
-
+	printf(
+		"%s\nOpenGL %s\nGLFW %s\n%s\n%s\n",
+		CPU_Info,
+		glGetString(GL_VERSION),
+		glfwGetVersionString(),
+		glGetString(GL_RENDERER),
+		glGetString(GL_VENDOR)
+	);
 
 	return self;
 }
+
+#ifdef WINDOW_FROM_ARGS
+Window* NewWindowFromArgs(int args, char** argv, const char* title) 
+{
+	if (args >= 2) 
+	{
+		return NewWindow(atoi(argv[1]), atoi(argv[2]), title, !strcmp(argv[3], "true") ? true : false);
+	}
+	return NULL;
+}
+#endif
 
 /*! @brief Checks if the window is running and doesn't need to be closed.
  *
@@ -138,12 +200,17 @@ Window* NewWindow(int width, int height, const char* title, bool fullscreen)
  *
  *  @return If the window is running or not.
  */
-bool WindowIsRunning(Window* self)
+char WindowIsRunning(InsightWindow* self)
 {
 	return !glfwWindowShouldClose(self->window);
 }
 
-void WindowPollEvents(Window* self)
+/*! @brief Carry out the processing of the window.
+ *
+ *  @param[in] self Is the window that is going to be used in the function.
+ *
+ */
+void WindowPollEvents(InsightWindow* self)
 {
 	float currentTime = (float)glfwGetTime();
 	deltaTime = currentTime - lastTime;
@@ -158,18 +225,27 @@ void WindowPollEvents(Window* self)
 	glfwGetFramebufferSize(self->window, &self->width, &self->height);
 }
 
-void WindowSetSize(Window* self, int width, int height)
+/*! @brief Change the size of the window.
+ *
+ *  @param[in] self Is the window that is going to be used in the function.
+ *  @param[in] width Is the new width of thw window.
+ *  @param[in] height Is the new height of thw window.
+ *
+ */
+void WindowSetSize(InsightWindow* self, uint16_t width, uint16_t height)
 {
 	glfwSetWindowSize(self->window, width, height);
 	glfwSetWindowPos(self->window, (self->vidMode->width - width) / 2, (self->vidMode->height - height) / 2);
 }
 
-void WindowTerminate(Window* self) {
+/*! @brief Finishes the window and free's its memory.
+ *
+ *  @param[in] self Is the window that is going to be used in the function.
+ */
+void WindowTerminate(InsightWindow* self) {
 
 	InputTerminate(self->input);
-
 	glfwDestroyWindow(self->window);
-	glfwTerminate();
 
 	free(self);
 }

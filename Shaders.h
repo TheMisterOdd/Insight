@@ -23,7 +23,7 @@ static unsigned int new_shader(unsigned int type, char* src)
 		char* err = (char*)malloc(sizeof(char) * errState);
 		glGetShaderInfoLog(shader, errState, &errState, err);
 
-		fprintf(stderr, (type == GL_VERTEX_SHADER) ? "\nVERTEX_SHADER_ERROR: %s\n" : "\nFRAGMENT_SHADER_ERROR: %s\n", err);
+		printf((type == GL_VERTEX_SHADER) ? "\nVERTEX_SHADER_ERROR: %s\n" : "\nFRAGMENT_SHADER_ERROR: %s\n", err);
 	}
 
 	free(src);
@@ -56,7 +56,7 @@ static char* read_file(const char* path)
 		char* err = (char*)malloc(sizeof(char) * 128);
 		strerror_s(err, 128, errno);
 
-		fprintf(stderr, "Error: %s: %s\n", path, err);
+		printf("Error: %s: %s\n", path, err);
 		free(err);
 
 		return NULL;
@@ -66,10 +66,10 @@ static char* read_file(const char* path)
 	return buffer;
 }
 
-Shader NewShader(const char* vsPath, const char* fsPath)
+Shader mk_Shader(const char* vsPath, const char* fsPath)
 {
-	Shader self;
-	self = glCreateProgram();
+	printf("Loading new shader...\n");
+	Shader self = glCreateProgram();
 	unsigned int vs = new_shader(GL_VERTEX_SHADER, read_file(vsPath));
 	unsigned int fs = new_shader(GL_FRAGMENT_SHADER, read_file(fsPath));
 
@@ -85,4 +85,8 @@ Shader NewShader(const char* vsPath, const char* fsPath)
 	return self;
 }
 
+void ShaderTerminate(Shader shader)
+{
+	glDeleteProgram(shader);
+}
 

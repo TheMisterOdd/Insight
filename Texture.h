@@ -12,18 +12,23 @@
 #include <stb_image_write.h>
 #endif
 
+#include <time.h>
+
 typedef struct
 {
 	int width, height, channels;
 	unsigned int texture;
 }Texture;
 
-Texture* NewTexture(const char* path, bool antialias)
+Texture* mk_Texture(const char* path, int antialias)
 {
+	printf("Loading new texture '%s'...\n", path);
 	Texture* self = (Texture*)malloc(sizeof(Texture));
-
 	glGenTextures(1, &self->texture);
+
+	stbi_set_flip_vertically_on_load(1);
 	unsigned char* img = stbi_load(path, &self->width, &self->height, &self->channels, STBI_rgb_alpha);
+	stbi_set_flip_vertically_on_load(0);
 
 	if (!img)
 	{
@@ -51,8 +56,9 @@ Texture* NewTexture(const char* path, bool antialias)
 	return self;
 }
 
-Texture* NewTextureSkyBox(const char** faces_files, unsigned int lenght)
+Texture* mk_TextureSkyBox(const char** faces_files, unsigned int lenght)
 {
+	printf("Loading new skybox texture...\n");
 	Texture* self = (Texture*)malloc(sizeof(Texture));
 	unsigned char* img = 0;
 
@@ -87,34 +93,53 @@ Texture* NewTextureSkyBox(const char** faces_files, unsigned int lenght)
 	return self;
 }
 
+static int TextureMakeScreenshot()
+{
+	time_t t = time(NULL);
+	struct tm tm;
+	localtime_s(&tm, &t);
+
+	int viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+
+	int x = viewport[0];
+	int y = viewport[1];
+	int width = viewport[2];
+	int height = viewport[3];
+
+	char *data = (char*)malloc((size_t)(width * height * 3)); // 3 components (R, G, B)
+
+	if (!data)
+		return 0;
+
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+	char* _Buffer = (char*)malloc(sizeof(char) * 512);
+	sprintf_s(_Buffer, 512, "%d-%d-%d_%d.%d.%02d.png", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+	stbi_flip_vertically_on_write(1);
+	int saved = stbi_write_png(_Buffer, width, height, 3, data, 0);
+
+	free(data);
+	free(_Buffer);
+
+	return saved;
+}
+
 void TextureBind(Texture* self, unsigned int sampler)
 {
 	glActiveTexture(GL_TEXTURE0 + sampler);
 	glBindTexture(GL_TEXTURE_2D, self->texture);
+	
 }
 
-bool Screenshoot(Window* window)
+void TextureTerminate(Texture* self) 
 {
-	int n = 3 * window->width * window->height;
-	unsigned char* pixels = (unsigned char*)malloc(sizeof(unsigned char) * n);
-
-	glClipControl(GL_UPPER_LEFT, 1);
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-
-	glReadPixels(0, 0, window->width, window->height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-	if (pixels == NULL)
-	{
-		fputs("Error: Unable to read pixels.", stderr);
-		return false;
-	}
-
-	char* outfile = (char*)malloc(sizeof(char) * 128);
-	sprintf_s(outfile, 128, "screenshot_%lf.png", glfwGetTime());
-	stbi_write_png(outfile, window->width, window->height, 3, pixels, 3 * window->width);
-	free(outfile);
-
-	// Free resources
-	stbi_image_free(pixels);
-
-	return true; // return true if the screenshot was success
+	glDeleteTextures(1, &self->texture);
+	self->channels = 0;
+	self->width = 0;
+	self->height = 0;
+	
+	free(self);
 }

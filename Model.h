@@ -3,14 +3,14 @@
 #include <stdlib.h>
 #include <glad/glad.h>
 
-typedef struct 
+typedef struct
 {
 	unsigned int Data, SupplyData;
 } Model;
 
 #define MODEL_SIZE 1.f
 
-Model* NewModel3D() 
+Model* mk_Model3D()
 {
 	Model* self = (Model*)malloc(sizeof(Model));
 	if (!self)
@@ -46,14 +46,14 @@ Model* NewModel3D()
 		 MODEL_SIZE, -MODEL_SIZE, -MODEL_SIZE,  1.0f,  0.0f,  0.0f,
 		 MODEL_SIZE, -MODEL_SIZE,  MODEL_SIZE,  1.0f,  0.0f,  0.0f,
 		 MODEL_SIZE,  MODEL_SIZE,  MODEL_SIZE,  1.0f,  0.0f,  0.0f,
-		 			     
+
 		-MODEL_SIZE, -MODEL_SIZE, -MODEL_SIZE,  0.0f, -1.0f,  0.0f,
 		 MODEL_SIZE, -MODEL_SIZE, -MODEL_SIZE,  0.0f, -1.0f,  0.0f,
 		 MODEL_SIZE, -MODEL_SIZE,  MODEL_SIZE,  0.0f, -1.0f,  0.0f,
 		 MODEL_SIZE, -MODEL_SIZE,  MODEL_SIZE,  0.0f, -1.0f,  0.0f,
 		-MODEL_SIZE, -MODEL_SIZE,  MODEL_SIZE,  0.0f, -1.0f,  0.0f,
 		-MODEL_SIZE, -MODEL_SIZE, -MODEL_SIZE,  0.0f, -1.0f,  0.0f,
-		 			     
+
 		-MODEL_SIZE,  MODEL_SIZE, -MODEL_SIZE,  0.0f,  1.0f,  0.0f,
 		 MODEL_SIZE,  MODEL_SIZE, -MODEL_SIZE,  0.0f,  1.0f,  0.0f,
 		 MODEL_SIZE,  MODEL_SIZE,  MODEL_SIZE,  0.0f,  1.0f,  0.0f,
@@ -79,11 +79,11 @@ Model* NewModel3D()
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0); // Unbind VAO
-	
+
 	return self;
 }
 
-Model* NewModel2D() 
+Model* mk_Model2D()
 {
 	printf("Loading new model...\n");
 	Model* self = (Model*)malloc(sizeof(Model));
@@ -93,11 +93,11 @@ Model* NewModel2D()
 
 	float vertices[] =
 	{
-		 // Positions			// Color			// TexCoords
-		 1.0f,  1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		1.0f,  1.0f,	// 0
-		 1.0f, -1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		1.0f,  0.0f,	// 1
-	   	-1.0f, -1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		0.0f,  0.0f,	// 2	
-	   	-1.0f,  1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		0.0f,  1.0f	// 3
+		// Positions			// Color				// TexCoords
+		1.0f,  1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		1.0f,  1.0f,	// 0
+		1.0f, -1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		1.0f,  0.0f,	// 1
+	   -1.0f, -1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		0.0f,  0.0f,	// 2	
+	   -1.0f,  1.0f, 0.0f,		1.0f, 1.0f, 1.0f,		0.0f,  1.0f		// 3
 
 	};
 	unsigned int indices[] =
@@ -130,22 +130,22 @@ Model* NewModel2D()
 	return self;
 }
 
-void ModelDraw(Model* self, int count)
-{	
+void ModelDraw(Model* self, int count, GLenum types)
+{
 	glBindVertexArray(self->Data);
-	glDrawArrays(GL_TRIANGLES, 0, count);
+	glDrawArrays(types, 0, count);
 	glBindVertexArray(0);
 }
 
-void ModelDrawWithEBOs(Model* self, int count) 
+void ModelDrawWithEBOs(Model* self, int count, GLenum type)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, self->Data);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->SupplyData);
-	glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, NULL);
+	glDrawElements(type, count, GL_UNSIGNED_INT, NULL);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void ModelTerminate(Model* self) 
+void ModelTerminate(Model* self)
 {
 	glDeleteBuffers(1, &self->Data);
 	glDeleteBuffers(1, &self->SupplyData);
