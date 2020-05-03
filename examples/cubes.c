@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Window.h"
 #include "Shaders.h"
 #include "Model.h"
@@ -8,8 +6,8 @@
 
 Camera* camera = NULL;
 
-Shader Lighting, Lamp;
-Model model;
+GLuint Lighting, Lamp;
+Model* model;
 
 mat4 projection = GLM_MAT4_IDENTITY_INIT;
 mat4 object = GLM_MAT4_IDENTITY_INIT;
@@ -25,37 +23,37 @@ void keyboard_manager(Window* window)
 
 	if (InputIsKeyDown(window->input, GLFW_KEY_W))
 	{
-		CameraKeyInput(camera, FORWARD, GetDelta());
+		CameraKeyInput(camera, FORWARD, deltaTime);
 	}
 
 	if (InputIsKeyDown(window->input, GLFW_KEY_S))
 	{
-		CameraKeyInput(camera, BACKWARD, GetDelta());
+		CameraKeyInput(camera, BACKWARD, deltaTime);
 	}
 
 	if (InputIsKeyDown(window->input, GLFW_KEY_A))
 	{
-		CameraKeyInput(camera, LEFT, GetDelta());
+		CameraKeyInput(camera, LEFT, deltaTime);
 	}
 
 	if (InputIsKeyDown(window->input, GLFW_KEY_D))
 	{
-		CameraKeyInput(camera, RIGHT, GetDelta());
+		CameraKeyInput(camera, RIGHT, deltaTime);
 	}
 
 	if (InputIsKeyDown(window->input, GLFW_KEY_SPACE))
 	{
-		CameraKeyInput(camera, UP, GetDelta());
+		CameraKeyInput(camera, UP, deltaTime);
 	}
 
 	if (InputIsKeyDown(window->input, GLFW_KEY_LEFT_CONTROL))
 	{
-		CameraKeyInput(camera, DOWN, GetDelta());
+		CameraKeyInput(camera, DOWN, deltaTime);
 	}
 
 	if (InputIsKeyPressed(window->input, GLFW_KEY_F2))
 	{
-		Screenshoot(window);
+		TextureMakeScreenshot(window);
 	}
 
 	if (InputIsKeyPressed(window->input, GLFW_KEY_F3) && !GL_POLY)
@@ -70,21 +68,18 @@ void keyboard_manager(Window* window)
 	}
 
 	printf(
-		"\rDisplay[%d, %d], frames: %.0f, %.1fms\t", window->width, window->height, 1 / GetDelta(), GetDelta() * 1000
+		"\rDisplay[%d, %d], frames: %.0f, %.1fms\t", window->width, window->height, 1 / deltaTime, deltaTime * 1000
 	);
 
 }
 void var_init(Window* window)
 {
-	WindowSetCursor(window->window, "assests/cursor.png");
-	WindowSetIcon(window->window, "assests/icon.png");
+	Lighting = NewShader("assests/shaders/lighting.vs", "assests/shaders/lighting.fs");
+	Lamp = NewShader("assests/shaders/lamp.vs", "assests/shaders/lamp.fs");
 
-	Lighting = mk_Shader("assests/shaders/lighting.vs", "assests/shaders/lighting.fs");
-	Lamp = mk_Shader("assests/shaders/lamp.vs", "assests/shaders/lamp.fs");
+	model = NewModel3D();
 
-	model = mk_Model();
-
-	camera = mk_Camera(
+	camera = NewCamera(
 		(vec3) {
 		0.0f, 0.0f, 3.0f
 	},
@@ -92,7 +87,8 @@ void var_init(Window* window)
 		0.0f, 1.0f, 0.0f
 	},
 			YAW,
-			PITCH
+			PITCH,
+			SENSITIVTY
 			);
 
 	glm_perspective(camera->zoom, (float)window->width / (float)window->height, -1.f, 100.0f, projection);
@@ -101,7 +97,8 @@ void var_init(Window* window)
 
 int main(void)
 {
-	Window* window = mk_Window(1280, 720, "OpenGL", false);
+	InsightInit();
+	Window* window = NewWindow(1280, 720, "OpenGL", false);
 	var_init(window);
 
 	vec3 cubePositions[] =
@@ -121,6 +118,7 @@ int main(void)
 
 	while (WindowIsRunning(window))
 	{
+		WindowPollEvents(window);
 		// Math:	
 		glm_perspective(camera->zoom, (float)window->width / (float)window->height, 0.1f, 100.0f, projection);
 		CameraGetViewMatrix(camera, view);
@@ -141,7 +139,7 @@ int main(void)
 
 			glUniform4f(glGetUniformLocation(Lighting, "ObjectColor"), 1.0f, 0.25f, 0.31f, 1.0f);
 
-			ModelDraw(model);
+			ModelDraw(model, 36, GL_TRIANGLES);
 			glUseProgram(0);
 
 
@@ -155,7 +153,7 @@ int main(void)
 			glUniformMatrix4fv(glGetUniformLocation(Lamp, "View"), 1, GL_FALSE, (float*)view);
 			glUniformMatrix4fv(glGetUniformLocation(Lamp, "Object"), 1, GL_FALSE, (float*)object);
 
-			ModelDraw(model);
+			ModelDraw(model, 36, GL_TRIANGLES);
 			glUseProgram(0);
 		}
 
