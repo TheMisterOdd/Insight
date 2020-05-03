@@ -20,10 +20,12 @@ typedef struct
 	unsigned int texture;
 }Texture;
 
-Texture* mk_Texture(const char* path, int antialias)
+Texture* NewTexture(const char* path, int antialias)
 {
 	printf("Loading new texture '%s'...\n", path);
 	Texture* self = (Texture*)malloc(sizeof(Texture));
+	assert(self != NULL);
+
 	glGenTextures(1, &self->texture);
 
 	stbi_set_flip_vertically_on_load(1);
@@ -56,11 +58,11 @@ Texture* mk_Texture(const char* path, int antialias)
 	return self;
 }
 
-Texture* mk_TextureSkyBox(const char** faces_files, unsigned int lenght)
+Texture* NewTextureSkyBox(char** faces_files, unsigned int lenght)
 {
 	printf("Loading new skybox texture...\n");
 	Texture* self = (Texture*)malloc(sizeof(Texture));
-	unsigned char* img = 0;
+	unsigned char *img = 0;
 
 	glGenTextures(1, &self->texture);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, self->texture);
@@ -107,7 +109,7 @@ static int TextureMakeScreenshot()
 	int width = viewport[2];
 	int height = viewport[3];
 
-	char *data = (char*)malloc((size_t)(width * height * 3)); // 3 components (R, G, B)
+	unsigned char* data = (unsigned char*)malloc((size_t)(width * height * 3)); // 3 components (R, G, B)
 
 	if (!data)
 		return 0;

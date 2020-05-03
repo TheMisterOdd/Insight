@@ -38,7 +38,7 @@ typedef struct
 
 } Camera;
 
-void CameraUpdate(Camera* self)
+void CameraUpdate(Camera *self)
 {
 	// Calculate the new Front vector
 	vec3 front = {
@@ -56,10 +56,11 @@ void CameraUpdate(Camera* self)
 	glm_normalize_to(front, self->up);
 }
 
-Camera* mk_Camera(vec3 position, vec3 up, float yaw, float pitch, float sensitivity)
+Camera *NewCamera(vec3 position, vec3 up, float yaw, float pitch, float sensitivity)
 {
 	printf("Loading camera...\n");
-	Camera* self = (Camera*)malloc(sizeof(Camera));
+	Camera *self = (Camera*)malloc(sizeof(Camera));
+	assert(self != NULL);
 
 	glm_vec3_copy(position, self->position);
 	glm_vec3_copy((vec3) { 0.0f, 0.0f, -1.0f }, self->front);
@@ -77,7 +78,7 @@ Camera* mk_Camera(vec3 position, vec3 up, float yaw, float pitch, float sensitiv
 	return self;
 }
 
-void CameraGetViewMatrix(Camera* self, mat4 dest)
+void CameraGetViewMatrix(Camera *self, mat4 dest)
 {
 	glm_lookat(
 		self->position,
@@ -88,7 +89,7 @@ void CameraGetViewMatrix(Camera* self, mat4 dest)
 
 }
 
-void CameraKeyInput(Camera* self, int direction, float deltaTime)
+void CameraKeyInput(Camera *self, int direction, float deltaTime)
 {
 	float velocity = self->movementSpeed * deltaTime;
 
@@ -148,7 +149,7 @@ void CameraKeyInput(Camera* self, int direction, float deltaTime)
 
 }
 
-void CameraMouseInput(Camera* self, float xOffset, float yOffset, float deltaTime, bool constrainPitch)
+void CameraMouseInput(Camera *self, float xOffset, float yOffset, float deltaTime, bool constrainPitch)
 {
 
 	xOffset *= self->mouseSensitivity;
@@ -175,7 +176,7 @@ void CameraMouseInput(Camera* self, float xOffset, float yOffset, float deltaTim
 	CameraUpdate(self);
 }
 
-void CameraScrollInput(Camera* self, float yOffset)
+void CameraScrollInput(Camera *self, float yOffset)
 {
 	if (self->zoom >= 1.0f && self->zoom <= 45.0f)
 	{

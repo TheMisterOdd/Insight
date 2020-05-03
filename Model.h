@@ -8,13 +8,12 @@ typedef struct
 	unsigned int Data, SupplyData;
 } Model;
 
-#define MODEL_SIZE 1.f
+#define MODEL_SIZE 1.0f
 
-Model* mk_Model3D()
+Model* NewModel3D()
 {
 	Model* self = (Model*)malloc(sizeof(Model));
-	if (!self)
-		return NULL;
+	assert(self != NULL);
 
 	printf("Loading new model...\n");
 	float vertices[] =
@@ -83,7 +82,7 @@ Model* mk_Model3D()
 	return self;
 }
 
-Model* mk_Model2D()
+Model* NewModel2D()
 {
 	printf("Loading new model...\n");
 	Model* self = (Model*)malloc(sizeof(Model));

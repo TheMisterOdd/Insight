@@ -4,12 +4,11 @@
 #include <stdlib.h>
 #include <glad/glad.h>
 
-typedef unsigned int Shader;
 #define ShaderBind(x) glUseProgram(x);
 
-static unsigned int new_shader(unsigned int type, char* src)
+GLuint new_shader(GLenum type, const char* src)
 {
-	unsigned int shader = glCreateShader(type);
+	GLuint shader = glCreateShader(type);
 	glShaderSource(shader, 1, &src, NULL);
 	glCompileShader(shader);
 
@@ -37,6 +36,7 @@ static char* read_file(const char* path)
 	long length;
 	FILE* f = NULL;
 	fopen_s(&f, path, "rb"); //was "rb"
+	assert(f != NULL);
 
 	if (f)
 	{
@@ -66,12 +66,12 @@ static char* read_file(const char* path)
 	return buffer;
 }
 
-Shader mk_Shader(const char* vsPath, const char* fsPath)
+GLuint NewShader(const char* vsPath, const char* fsPath)
 {
 	printf("Loading new shader...\n");
-	Shader self = glCreateProgram();
-	unsigned int vs = new_shader(GL_VERTEX_SHADER, read_file(vsPath));
-	unsigned int fs = new_shader(GL_FRAGMENT_SHADER, read_file(fsPath));
+	GLuint self = glCreateProgram();
+	GLuint vs = new_shader(GL_VERTEX_SHADER, read_file(vsPath));
+	GLuint fs = new_shader(GL_FRAGMENT_SHADER, read_file(fsPath));
 
 	glAttachShader(self, vs);
 	glAttachShader(self, fs);
@@ -79,13 +79,16 @@ Shader mk_Shader(const char* vsPath, const char* fsPath)
 	glLinkProgram(self);
 	glValidateProgram(self);
 
+	glDetachShader(self, vs);
+	glDetachShader(self, fs);
 	glDeleteShader(vs);
 	glDeleteShader(fs);
+	
 
 	return self;
 }
 
-void ShaderTerminate(Shader shader)
+void ShaderTerminate(GLuint shader)
 {
 	glDeleteProgram(shader);
 }

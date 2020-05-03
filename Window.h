@@ -33,10 +33,10 @@ typedef struct
 	int width, height, fullscreen;
 
 	GLFWwindow* window;
-	GLFWvidmode* vidMode;
+	const GLFWvidmode* vidMode;
 	Input* input;
 
-} InsightWindow;
+} Window;
 
 /*! @brief Sets a window cursor
  *
@@ -45,7 +45,7 @@ typedef struct
  *
  *  @errors Window cursor could not be setted
  */
-void WindowSetCursor(InsightWindow* window, const char* path)
+GLFWcursor* WindowSetCursor(Window* window, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
@@ -53,6 +53,8 @@ void WindowSetCursor(InsightWindow* window, const char* path)
 
 	glfwSetCursor(window->window, cursor);
 	free(image);
+
+	return cursor;
 }
 
 /*! @brief Sets a window icon
@@ -62,7 +64,7 @@ void WindowSetCursor(InsightWindow* window, const char* path)
  *
  *  @errors Window icon could not be setted
  */
-void WindowSetIcon(InsightWindow* window, const char* path)
+void WindowSetIcon(Window* window, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
@@ -78,8 +80,8 @@ void WindowSetIcon(InsightWindow* window, const char* path)
 static void WindowGetSystemInfo() 
 {
 	int CPUInfo[4] = { -1 };
-	unsigned   nExIds, i = 0;
-	char* CPUBrandString = (char*)malloc(sizeof(char) * 0x40);
+	unsigned nExIds, i = 0;
+	char *CPUBrandString = (char*)malloc(sizeof(char) * 0x40);
 
 	// Get the information associated with each extended ID.
 	__cpuid(CPUInfo, 0x80000000);
@@ -96,7 +98,6 @@ static void WindowGetSystemInfo()
 			memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
 	}
 	memcpy(&CPU_Info, &CPUBrandString, sizeof(char**));
-
 }
 
 void InsightInit() 
@@ -120,13 +121,15 @@ void InsightInit()
  *
  *  @errors Context could not be created
  */
-InsightWindow* mk_Window(int width, int height, const char* title, int fullscreen)
+Window* NewWindow(int width, int height, const char* title, int fullscreen)
 {
-	InsightWindow* self = (InsightWindow*)malloc(sizeof(InsightWindow));
+	Window* self = (Window*)malloc(sizeof(Window));
+	assert(self != NULL);
+
 	self->width = width;
 	self->height = height;
 	self->fullscreen = fullscreen;
-	self->vidMode = (GLFWvidmode*)glfwGetVideoMode(glfwGetPrimaryMonitor());
+	self->vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
 	printf("Loading Window...\n");
 
@@ -134,7 +137,6 @@ InsightWindow* mk_Window(int width, int height, const char* title, int fullscree
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_SAMPLES, 8);
 
 	if (self->width == self->vidMode->width && self->height == self->vidMode->height)
 		glfwWindowHint(GLFW_DECORATED, GL_FALSE);
@@ -183,34 +185,12 @@ InsightWindow* mk_Window(int width, int height, const char* title, int fullscree
 	return self;
 }
 
-#ifdef WINDOW_FROM_ARGS
-Window* NewWindowFromArgs(int args, char** argv, const char* title) 
-{
-	if (args >= 2) 
-	{
-		return NewWindow(atoi(argv[1]), atoi(argv[2]), title, !strcmp(argv[3], "true") ? true : false);
-	}
-	return NULL;
-}
-#endif
-
-/*! @brief Checks if the window is running and doesn't need to be closed.
- *
- *  @param[in] self Is the window that is going to be used in the function.
- *
- *  @return If the window is running or not.
- */
-char WindowIsRunning(InsightWindow* self)
-{
-	return !glfwWindowShouldClose(self->window);
-}
-
 /*! @brief Carry out the processing of the window.
  *
  *  @param[in] self Is the window that is going to be used in the function.
  *
  */
-void WindowPollEvents(InsightWindow* self)
+void WindowPollEvents(Window* self)
 {
 	float currentTime = (float)glfwGetTime();
 	deltaTime = currentTime - lastTime;
@@ -221,8 +201,17 @@ void WindowPollEvents(InsightWindow* self)
 	glFlush();
 	glfwSwapBuffers(self->window);
 	glfwPollEvents();
+}
 
-	glfwGetFramebufferSize(self->window, &self->width, &self->height);
+/*! @brief Checks if the window is running and doesn't need to be closed.
+ *
+ *  @param[in] self Is the window that is going to be used in the function.
+ *
+ *  @return If the window is running or not.
+ */
+char WindowIsRunning(Window* self)
+{
+	return !glfwWindowShouldClose(self->window);
 }
 
 /*! @brief Change the size of the window.
@@ -232,7 +221,7 @@ void WindowPollEvents(InsightWindow* self)
  *  @param[in] height Is the new height of thw window.
  *
  */
-void WindowSetSize(InsightWindow* self, uint16_t width, uint16_t height)
+void WindowSetSize(Window* self, int width, int height)
 {
 	glfwSetWindowSize(self->window, width, height);
 	glfwSetWindowPos(self->window, (self->vidMode->width - width) / 2, (self->vidMode->height - height) / 2);
@@ -242,8 +231,8 @@ void WindowSetSize(InsightWindow* self, uint16_t width, uint16_t height)
  *
  *  @param[in] self Is the window that is going to be used in the function.
  */
-void WindowTerminate(InsightWindow* self) {
-
+void WindowTerminate(Window* self) 
+{
 	InputTerminate(self->input);
 	glfwDestroyWindow(self->window);
 
