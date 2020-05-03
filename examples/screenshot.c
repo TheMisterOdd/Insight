@@ -3,7 +3,7 @@
 
 int main(void) {
    
-   Window* window = NewWindow(1280, 720, "OpenGL", false);
+   Window *window = NewWindow(1280, 720, "OpenGL", false);
    
 	while (WindowIsRunning(window)) 
 	{
