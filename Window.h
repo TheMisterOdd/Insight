@@ -138,8 +138,6 @@ Window* NewWindow(int width, int height, const char* title, int fullscreen)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	if (self->width == self->vidMode->width && self->height == self->vidMode->height)
-		glfwWindowHint(GLFW_DECORATED, GL_FALSE);
 
 	self->window = glfwCreateWindow(self->width, self->height, title, self->fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL);
 
