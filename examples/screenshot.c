@@ -3,9 +3,10 @@
 
 int main(void) {
    
-   Window *window = NewWindow(1280, 720, "OpenGL", false);
+   Window window;
+   NewWindow(&window, 1280, 720, "OpenGL", false);
    
-	while (WindowIsRunning(window)) 
+	while (WindowIsRunning(&window)) 
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
@@ -14,5 +15,6 @@ int main(void) {
 			break; // if the screenshot was success, breaks the loop
 	}
     
+    WindowTerminate(&window);
     return 0;
 }
