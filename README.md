@@ -15,14 +15,14 @@ int main(void) {
    
    Insight_Window* wnd = Insight_NewWindow(1280, 720, "OpenGL", false);
    
-   while (WindowIsRunning(&window)) {
+   while (Insight_WindowIsRunning(&window)) {
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 
     }
     
-    WindowTerminate(wnd);
+    Insight_WindowTerminate(wnd);
     return 0;
 }
 ```
