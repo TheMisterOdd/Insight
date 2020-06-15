@@ -1,3 +1,6 @@
+#ifndef _WINDOW_H_
+#define _WINDOW_H_
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -43,3 +46,5 @@ void Insight_WindowTerminate(Insight_Window* self);
 GLFWcursor* Insight_WindowSetCursor(Insight_Window* self, const char* path);
 
 void Insight_WindowSetIcon(Insight_Window* self, const char* path);
+
+#endif
