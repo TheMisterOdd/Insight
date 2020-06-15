@@ -9,8 +9,6 @@ void Insight_InputCreate(Insight_Input* self, GLFWwindow* window)
 	}
 
 	self->window = window;
-	self->keys = (_Bool*)malloc(sizeof(_Bool) * GLFW_KEY_LAST);
-	self->mouseButtons = (_Bool*)malloc(sizeof(_Bool) * GLFW_MOUSE_BUTTON_LAST);
 }
 
 _Bool Insight_IsKeyDown(Insight_Input* self, int key)
@@ -64,11 +62,6 @@ void Insight_InputUpdate(Insight_Input* self)
 
 void Insight_InputTerminate(Insight_Input* self)
 {
-	free(self->keys);
-	free(self->mouseButtons);
-
 	self->window = NULL;
-	self->keys = self->mouseButtons = NULL;
-
 	self = NULL;
 }

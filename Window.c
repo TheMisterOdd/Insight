@@ -77,7 +77,7 @@ Insight_Window* Insight_NewWindow(int width, int height, const char* title, _Boo
 	if (self->wnd_hndl == NULL)
 	{
 		fprintf(stderr, "[Error]: Cannot create a GLFW window context.");
-		return;
+		return NULL;
 	}
 
 	glfwSetWindowPos(self->wnd_hndl, (self->vidMode->width - self->width) / 2, (self->vidMode->height - self->height) / 2);

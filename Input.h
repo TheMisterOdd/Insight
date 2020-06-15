@@ -9,8 +9,8 @@
 typedef struct 
 {
 	GLFWwindow* window;
-	_Bool* keys;
-	_Bool* mouseButtons;
+	_Bool keys[GLFW_KEY_LAST];
+	_Bool mouseButtons[GLFW_MOUSE_BUTTON_LAST];
 
 } Insight_Input;
 

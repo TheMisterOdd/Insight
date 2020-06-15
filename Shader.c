@@ -1,6 +1,8 @@
 #include "Shader.h"
 
 #include <assert.h>
+#include <malloc.h>
+#include <stdio.h>
 
 GLuint new_shader(GLenum type, const char* src) 
 {
