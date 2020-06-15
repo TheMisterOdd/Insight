@@ -3,9 +3,6 @@
 
 #include <glad/glad.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-
 typedef struct 
 {
 	GLuint id;
