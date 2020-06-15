@@ -13,8 +13,7 @@ Insight is completely free and open source with no licence. No strings attached,
 
 int main(void) {
    
-   Window w;
-   NewWindow(&w, 1280, 720, "OpenGL", false);
+   Insight_Window* wnd = Insight_NewWindow(1280, 720, "OpenGL", false);
    
    while (WindowIsRunning(&window)) {
 
@@ -23,7 +22,7 @@ int main(void) {
 
     }
     
-    WindowTerminate(&w);
+    WindowTerminate(wnd);
     return 0;
 }
 ```
