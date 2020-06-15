@@ -1,81 +1,38 @@
-#pragma once
+#ifndef _INPUT_H_
+#define _INPUT_H_
 
 #include <assert.h>
-#include "Window.h"
+#include <cglm/cglm.h>
 
-#include <cglm.h>
+#include <GLFW/glfw3.h>
 
-typedef struct
+typedef struct 
 {
 	GLFWwindow* window;
-	int* keys;
-	int* mouseButtons;
+	_Bool* keys;
+	_Bool* mouseButtons;
 
-}Input;
+} Insight_Input;
 
-Input* NewInput(GLFWwindow* window)
-{
-	Input* self = (Input*)malloc(sizeof(Input));
-	assert(self != NULL);
+void Insight_InputCreate(Insight_Input* self, GLFWwindow* window);
 
-	self->window = window;
-	self->keys = (int*)malloc(sizeof(int) * GLFW_KEY_LAST);
-	self->mouseButtons = (int*)malloc(sizeof(int) * GLFW_MOUSE_BUTTON_LAST);
+_Bool Insight_IsKeyDown(Insight_Input* self, int key);
 
-	return self;
-}
+_Bool Insight_IsKeyPressed(Insight_Input* self, int key);
 
-int InputIsKeyDown(Input* self, int key)
-{
-	return glfwGetKey(self->window, key) == 1;
-}
+_Bool Insight_IsKeyReleased(Insight_Input* self, int key);
 
-int InputIsKeyPressed(Input* self, int key)
-{
-	return (InputIsKeyDown(self, key) && !self->keys[key]);
-}
+_Bool Insight_IsMouseButtonDown(Insight_Input* self, int button);
 
-int InputIsKeyReleased(Input* self, int key)
-{
-	return (!InputIsKeyDown(self, key) && self->keys[key]);
-}
+_Bool Insight_IsMouseButtonPressed(Insight_Input* self, int button);
 
-int InputIsMouseButtonDown(Input* self, int button)
-{
-	return glfwGetMouseButton(self->window, button) == 1;
-}
+_Bool Insight_IsMouseButtonReleased(Insight_Input* self, int button);
 
-int InputIsMouseButtonPressed(Input* self, int button)
-{
-	return (InputIsMouseButtonDown(self, button) && !self->mouseButtons[button]);
-}
+void Insight_GetMousePos(Insight_Input* self, double* x, double* y);
 
-int InputIsMouseButtonReleased(Input* self, int button)
-{
-	return (!InputIsMouseButtonDown(self, button) && self->mouseButtons[button]);
-}
+void Insight_InputUpdate(Insight_Input* self);
 
-void InputUpdate(Input* self)
-{
-	for (uint16_t i = 32; i < GLFW_KEY_LAST; i++)
-	{
-		self->keys[i] = InputIsKeyDown(self, i);
-	}
+void Insight_InputTerminate(Insight_Input* self);
 
-	for (uint8_t i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++)
-	{
-		self->mouseButtons[i] = InputIsMouseButtonDown(self, i);
-	}
-}
+#endif
 
-void InputGetMousePos(Input* self, vec2 dest)
-{
-	glfwGetCursorPos(self->window, (float*)&dest[0], (float*)&dest[1]);
-}
-
-void InputTerminate(Input* self)
-{
-	free(self->keys);
-	free(self->mouseButtons);
-	free(self);
-}
