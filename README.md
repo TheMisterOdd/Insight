@@ -15,7 +15,7 @@ int main(void) {
    
    Insight_Window* wnd = Insight_NewWindow(1280, 720, "OpenGL", false);
    
-   while (Insight_WindowIsRunning(&window)) {
+   while (Insight_WindowIsRunning(wnd)) {
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
