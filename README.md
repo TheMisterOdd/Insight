@@ -61,14 +61,7 @@ int main(void)
 	insight_input_ptr     = (void*)input;
 	insight_terminate_ptr = (void*)terminate;
 
-	if (!insight_init("Game")) 
-	{
-		fprintf(stderr, "[Error]: Cannot initialize the Insight Context.\n");
-		return -1;
-	}
-		
-	insight_update();
-	insight_terminate();
+	insight_engine("Insight", 0);
 
 	return 0;
 }
