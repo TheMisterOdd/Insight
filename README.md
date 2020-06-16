@@ -8,7 +8,30 @@ Unfortunately we have not managed to port the engine to Android or HTML, nor tra
 Insight is completely free and open source with no licence. No strings attached, no royalties, nothing. The users' games are theirs, down to the last line of engine code. We don't want to make profit from this project.
 
 ### Example code
-**'Easy init':**
+Easy init:
+```c
+#include "Insight.h"
+#include "Window.h"
+
+int main(void) {
+   
+   insight_glfw_init();
+   window_t* wnd = insight_window_init(1280, 720, "OpenGL", false);
+   assert(wnd);
+   
+   while (window_is_running(wnd)) {
+
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+
+    }
+    
+    window_terminate(wnd);
+    return 0;
+}
+```
+
+Insight Init:
 ```c
 #include "Insight.h"
 #include "Window.h"
