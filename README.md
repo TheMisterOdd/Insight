@@ -13,16 +13,18 @@ Insight is completely free and open source with no licence. No strings attached,
 
 int main(void) {
    
-   Insight_Window* wnd = Insight_NewWindow(1280, 720, "OpenGL", false);
+   glfwInit();
+   window_t* wnd = insight_window_init(1280, 720, "OpenGL", false);
+   assert(wnd);
    
-   while (Insight_WindowIsRunning(wnd)) {
+   while (window_is_running(wnd)) {
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 
     }
     
-    Insight_WindowTerminate(wnd);
+    window_terminate(wnd);
     return 0;
 }
 ```
