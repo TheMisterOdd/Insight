@@ -33,9 +33,6 @@ int main(void) {
 
 Insight Init:
 ```c
-#ifndef _MAIN_H_
-#define _MAIN_H_
-
 #include "Insight.h"
 #include <stdlib.h>
 
@@ -82,9 +79,6 @@ int main(void)
 
 	return 0;
 }
-
-#endif
-
 ```
 ### Output
 <img width="854" height="480" src="https://raw.githubusercontent.com/AlKiam/Insight3D/master/image/image-1.png" alt="window output"/>
