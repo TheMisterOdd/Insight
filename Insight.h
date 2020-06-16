@@ -9,6 +9,10 @@
 
 const char* insight_cpu_info();
 
+/*! Function that initialices only GLFW. */
+_Bool insight_glfw_init();
+
+/*! Function that initialices only Insight, GLFW and create a window with the user given functions. */
 _Bool insight_init(const char* title);
 
 void insight_update();

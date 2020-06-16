@@ -45,6 +45,11 @@ static int window_get_system_info()
 	return CPU_INFO != NULL ? 1 : 0;
 }
 
+_Bool insight_glfw_init()
+{
+	return (!glfwInit() || !window_get_system_info());
+}
+
 _Bool insight_init(const char* title)
 {
 	if (!glfwInit() || !window_get_system_info())
