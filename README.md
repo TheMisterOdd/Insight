@@ -9,11 +9,12 @@ Insight is completely free and open source with no licence. No strings attached,
 
 ### Example code
 ```c
+#include "Insight.h"
 #include "Window.h"
 
 int main(void) {
    
-   glfwInit();
+   insight_glfw_init();
    window_t* wnd = insight_window_init(1280, 720, "OpenGL", false);
    assert(wnd);
    
