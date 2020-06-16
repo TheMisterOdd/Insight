@@ -33,25 +33,58 @@ int main(void) {
 
 Insight Init:
 ```c
+#ifndef _MAIN_H_
+#define _MAIN_H_
+
 #include "Insight.h"
-#include "Window.h"
+#include <stdlib.h>
 
-int main(void) {
-   
-   insight_glfw_init();
-   window_t* wnd = insight_window_init(1280, 720, "OpenGL", false);
-   assert(wnd);
-   
-   while (window_is_running(wnd)) {
-
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-
-    }
-    
-    window_terminate(wnd);
-    return 0;
+void init(window_t* wnd) 
+{
 }
+
+void update() 
+{
+}
+
+void draw()
+{
+}
+
+void input(window_t* wnd)
+{
+	if (input_is_key_pressed(wnd->input, GLFW_KEY_ESCAPE))
+	{
+		glfwSetWindowShouldClose(wnd->wnd_hndl, GLFW_TRUE);
+	}
+}
+
+void terminate() 
+{
+}
+
+int main(void)
+{
+	insight_init_ptr      = (void*)init;
+	insight_update_ptr    = (void*)update;
+	insight_draw_ptr      = (void*)draw;
+	insight_input_ptr     = (void*)input;
+	insight_terminate_ptr = (void*)terminate;
+
+	if (!insight_init("Game")) 
+	{
+		fprintf(stderr, "[Error]: Cannot initialize the Insight Context.\n");
+		return -1;
+	}
+		
+	insight_update();
+	insight_terminate();
+
+	return 0;
+}
+
+#endif
+
 ```
 ### Output
 <img width="854" height="480" src="https://raw.githubusercontent.com/AlKiam/Insight3D/master/image/image-1.png" alt="window output"/>
