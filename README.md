@@ -34,7 +34,6 @@ int main(void) {
 Insight Init:
 ```c
 #include "Insight.h"
-#include <stdlib.h>
 
 void init(window_t* wnd) 
 {
