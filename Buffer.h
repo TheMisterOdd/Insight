@@ -3,48 +3,64 @@
 
 #include <glad/glad.h>
 
+/*! Vertex array object */
 typedef struct
 {
 	GLuint id;
-} VAO;
+} vao_t;
 
+/*! Vertex buffer object */
 typedef struct
 {
 	GLuint id;
-} VBO;
+} vbo_t;
 
+/*! Index buffer object */
 typedef struct
 {
 	GLuint id;
 	GLsizeiptr count;
-} IBO;
+} ibo_t;
 
-/* VAO */
-VAO* NewVAO();
+/*! Returns a pointer to a vertex array object in memory */
+vao_t* vao_init();
 
-void VAOBind(VAO* self);
+/*! Binds the given vertex array object, in order to use it */
+void vao_bind(vao_t* self);
 
-void VAOUnbind();
+/*! Unbinds the current binded vertex array object */
+void vao_unbind();
 
-void VAOTerminate(VAO* self);
+/*! Deletes the memory of the given vertex array object */
+void vao_terminate(vao_t* self);
 
-/* VBO */
-VBO* NewVBO(const void* data, GLsizeiptr size);
+/*! Returns a pointer to a vertex buffer object in memory
+NOTE: The given array should have a three component value for position per vertex 
+and a two component value for texture cordinates per vertex.
+In case that you don't want this layout, you must set up your own model and buffer class.*/
+vbo_t* vbo_init(const void* data, GLsizeiptr size);
 
-void VBOBind(VBO* self);
+/*! Binds the given vertex buffer object, in order to use it */
+void vbo_bind(vbo_t* self);
 
-void VBOUnbind();
+/*! Unbinds the current binded vertex buffer object */
+void vbo_unbind();
 
-void VBOTerminate(VBO* self);
+/*! Deletes the memory of the given vertex buffer object */
+void vbo_terminate(vbo_t* self);
 
-/* IBO */
-IBO* NewIBO(const void* data, GLsizeiptr count);
 
-void IBOBind(IBO* self);
+/*! Returns a pointer to a index buffer object in memory */
+ibo_t* ibo_init(const void* data, GLsizeiptr count);
 
-void IBOUnbind();
+/*! Binds the given index buffer object, in order to use it */
+void ibo_bind(ibo_t* self);
 
-void IBOTerminate(IBO* self);
+/*! Unbinds the current binded index buffer object */
+void ibo_unbind();
+
+/*! Deletes the memory of the given index buffer object */
+void ibo_terminate(ibo_t* self);
 
 
 #endif // !_BUFFER_H_

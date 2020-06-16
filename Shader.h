@@ -6,11 +6,19 @@
 typedef struct 
 {
 	GLuint id;
-} Shader;
+} shader_t;
 
-Shader* NewShader(const char* vsPath, const char* fsPath);
+/*! Returns a pointer to a shader object in memory. */
+shader_t* shader_init(const char* vsPath, const char* fsPath);
 
-void ShaderTerminate(Shader* self);
+/*! Binds the given shader, so the user can use it. */
+void shader_bind(shader_t* self);
+
+/*! Unbinds the current binded shader, so it cannot be used anymore. */
+void shader_unbind();
+
+/*! Deletes the memory of the given shader. */
+void shader_terminate(shader_t* self);
 
 #endif
 

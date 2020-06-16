@@ -48,12 +48,12 @@ void Insight_GetMousePos(Insight_Input* self, double* x, double* y)
 
 void Insight_InputUpdate(Insight_Input* self)
 {
-	for (uint16_t i = 32; i < GLFW_KEY_LAST; i++) 
+	for (int i = 32; i < GLFW_KEY_LAST; i++)
 	{
 		self->keys[i] = Insight_IsKeyDown(self, i);
 	}
 
-	for (uint16_t i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++)
+	for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++)
 	{
 
 		self->mouseButtons[i] = Insight_IsMouseButtonDown(self, i);

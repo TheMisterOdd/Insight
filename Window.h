@@ -6,8 +6,6 @@
 
 #include "Input.h"
 
-static char* CPU_INFO;
-
 typedef struct
 {
 	/*! The width, in screen coordinates. */
@@ -31,20 +29,24 @@ typedef struct
 	/*! Video mode type. */
 	const GLFWvidmode* vidMode;
 
-} Insight_Window;
+} window_t;
 
-_Bool Insight_Init();
+/*! Returns a pointer to a window in memory */
+window_t* insight_new_window(int width, int height, const char* title, _Bool fullscreen);
 
-Insight_Window* Insight_NewWindow(int width, int height, const char* title, _Bool fullscreen);
+/*! Checks if the window is running or not */
+_Bool insight_window_is_running(window_t* self);
 
-_Bool Insight_WindowIsRunning(Insight_Window* self);
+/*! Sets new size of the window */
+void insight_window_set_size(window_t* self, int width, int height);
 
-void Insight_WindowSetSize(Insight_Window* self, int width, int height);
+/*! The memory of the window is freed */
+void insight_window_terminate(window_t* self);
 
-void Insight_WindowTerminate(Insight_Window* self);
+/*! Sets window cursor */
+GLFWcursor* insight_set_cursor(window_t* self, const char* path);
 
-GLFWcursor* Insight_WindowSetCursor(Insight_Window* self, const char* path);
-
-void Insight_WindowSetIcon(Insight_Window* self, const char* path);
+/*! Sets window icon */
+void insight_set_icon(window_t* self, const char* path);
 
 #endif

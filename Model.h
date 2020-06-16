@@ -3,20 +3,29 @@
 
 #include "Buffer.h"
 
+/*! Custom model */
 typedef struct 
 {
-	VAO* vao;
-	VBO* vbo;
-	IBO* ibo;
-} Model;
+	vao_t* vao;
+	vbo_t* vbo;
+	ibo_t* ibo;
+} model_t;
 
-Model* NewModel();
+/*! Returns a pointer to a model in memory. */
+model_t* model_init();
 
-void ModelBegin(Model* self);
+/*! Starts using the given model, so the user can start managing the model. */
+void model_begin(model_t* self);
 
-void ModelDraw(Model* self);
+/*! Draw the model onto screen.
+NOTE: 'model_begin' and 'model_end', should be called before and after this function, respectively. */
+void model_draw(model_t* self);
 
-void ModelEnd();
+/*! Stops using the current binded model, so the user cannot handle it anymore. */
+void model_end();
+
+/*! Deletes the memory of the given model. */
+void model_terminate(model_t* self);
 
 #endif // !_MODEL_H_
 

@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "Insight.h"
 
 #include <stdio.h>
 #include <malloc.h>
@@ -8,10 +9,12 @@
 #include <stb_image.h>
 #endif
 
+static _Bool has_resized = 0;
 
 static void window_resize_callback(GLFWwindow* window, int fbW, int fbH) 
 {
 	glViewport(0, 0, fbW, fbH);
+	has_resized = 1;
 }
 
 static void window_error_callback(int err, const char* desctiption)
@@ -19,44 +22,9 @@ static void window_error_callback(int err, const char* desctiption)
 	fprintf(stderr, "Error: %d: %s\n", err, desctiption);
 }
 
-static int window_get_system_info()
+window_t* insight_new_window(int width, int height, const char* title, _Bool fullscreen)
 {
-	int CPUInfo[4] = { -1 };
-	unsigned   nExIds, i = 0;
-	char* CPUBrandString = (char*)malloc(sizeof(char) * 0x40);
-
-	// Get the information associated with each extended ID.
-	__cpuid(CPUInfo, 0x80000000);
-	nExIds = CPUInfo[0];
-	for (i = 0x80000000; i <= nExIds; ++i)
-	{
-		__cpuid(CPUInfo, i);
-		// Interpret CPU brand string
-		if (i == 0x80000002)
-			memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-		else if (i == 0x80000003)
-			memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-		else if (i == 0x80000004)
-			memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
-	}
-	memcpy(&CPU_INFO, &CPUBrandString, sizeof(char**));
-	
-	return CPU_INFO != NULL ? 1 : 0;
-}
-
-_Bool Insight_Init() 
-{
-	if (!glfwInit() || !window_get_system_info())
-	{
-		return 0;
-	}
-
-	return 1;
-}
-
-Insight_Window* Insight_NewWindow(int width, int height, const char* title, _Bool fullscreen)
-{
-	Insight_Window* self = (Insight_Window*)malloc(sizeof(Insight_Window));
+	window_t* self = (window_t*)malloc(sizeof(window_t));
 	if (self == NULL)
 	{
 		fprintf(stderr, "[Error]: 'Insight_Window*', cannot be 'NULL'. File: %s:%d\n", __FILE__, __LINE__);
@@ -104,7 +72,7 @@ Insight_Window* Insight_NewWindow(int width, int height, const char* title, _Boo
 
 	printf(
 		"%s\nOpenGL %s\nGLFW %s\n%s\n%s\n",
-		CPU_INFO,
+		insight_cpu_info(),
 		glGetString(GL_VERSION),
 		glfwGetVersionString(),
 		glGetString(GL_RENDERER),
@@ -114,7 +82,7 @@ Insight_Window* Insight_NewWindow(int width, int height, const char* title, _Boo
 	return self;
 }
 
-_Bool Insight_WindowIsRunning(Insight_Window* self)
+_Bool insight_window_is_running(window_t* self)
 {
 	float currentTime = (float)glfwGetTime();
 	self->deltaTime = currentTime - self->lastTime;
@@ -130,19 +98,19 @@ _Bool Insight_WindowIsRunning(Insight_Window* self)
 	return !glfwWindowShouldClose(self->wnd_hndl);
 }
 
-void Insight_WindowSetSize(Insight_Window* self, int width, int height)
+void insight_window_set_size(window_t* self, int width, int height)
 {
 	glfwSetWindowSize(self->wnd_hndl, width, height);
 	glfwSetWindowPos(self->wnd_hndl, (self->vidMode->width - width) / 2, (self->vidMode->height - height) / 2);
 }
 
-void Insight_WindowTerminate(Insight_Window* self)
+void insight_window_terminate(window_t* self)
 {
 	Insight_InputTerminate(&self->input);
 	glfwDestroyWindow(self->wnd_hndl);
 }
 
-GLFWcursor* Insight_WindowSetCursor(Insight_Window* self, const char* path)
+GLFWcursor* insight_set_cursor(window_t* self, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
@@ -154,7 +122,7 @@ GLFWcursor* Insight_WindowSetCursor(Insight_Window* self, const char* path)
 	return cursor;
 }
 
-void Insight_WindowSetIcon(Insight_Window* self, const char* path)
+void insight_set_icon(window_t* self, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);

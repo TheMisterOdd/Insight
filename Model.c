@@ -3,17 +3,17 @@
 #include <malloc.h>
 #include <assert.h>
 
-Model* NewModel()
+model_t* model_init()
 {
-	Model* self = (Model*)malloc(sizeof(Model));
+	model_t* self = (model_t*)malloc(sizeof(model_t));
 	assert(self);
 
 	float vertices[] =
-	{	// Positions:				Color:
-		-0.5f, -0.5f, +0.0f,		+1.0f, +1.0f, +1.0f,		+0.0f, +0.0f,
-		+0.5f, -0.5f, +0.0f,		+1.0f, +1.0f, +1.0f,		+1.0f, +0.0f,
-		+0.5f, +0.5f, +0.0f,		+1.0f, +1.0f, +1.0f,		+1.0f, +1.0f,
-		-0.5f, +0.5f, +0.0f,		+1.0f, +1.0f, +1.0f,		+0.0f, +1.0f
+	{	// Positions:				TexCoords:
+		-0.5f, -0.5f, +0.0f,		+0.0f, +0.0f,
+		+0.5f, -0.5f, +0.0f,        +1.0f, +0.0f,
+		+0.5f, +0.5f, +0.0f,		+1.0f, +1.0f,
+		-0.5f, +0.5f, +0.0f,		+0.0f, +1.0f
 	};
 
 
@@ -23,34 +23,44 @@ Model* NewModel()
 		2, 3, 0
 	};
 
-	self->vao = NewVAO();
-	VAOBind(self->vao);
+	self->vao = vao_init();
+	vao_bind(self->vao);
 
-	self->vbo = NewVBO(vertices, sizeof(float) * 32);
-	self->ibo = NewIBO(indices, 6);
+	self->vbo = vbo_init(vertices, sizeof(float) * 32);
+	self->ibo = ibo_init(indices, 6);
 
-	VAOUnbind();
+	vao_unbind();
+	ibo_unbind();
 
 	return self;
 }
 
-void ModelBegin(Model* self)
+void model_begin(model_t* self)
 {
-	VAOBind(self->vao);
-	IBOBind(self->ibo);
+	vao_bind(self->vao);
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 }
 
-void ModelDraw(Model* self)
+void model_draw(model_t* self)
 {
 	glDrawElements(GL_TRIANGLES, self->ibo->count, GL_UNSIGNED_BYTE, NULL);
 }
 
-void ModelEnd()
+void model_end()
 {
-	IBOUnbind();
-	VAOUnbind();
+	vao_unbind();
 }
+
+void model_terminate(model_t* self)
+{
+	vao_terminate(self->vao);
+	vbo_terminate(self->vbo);
+	ibo_terminate(self->ibo);
+
+	free(self);
+}
+
+

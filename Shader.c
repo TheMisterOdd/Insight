@@ -59,29 +59,41 @@ char* read_file(const char* path)
 }
 
 
-Shader* NewShader(const char* vsPath, const char* fsPath)
+shader_t* shader_init(const char* vsPath, const char* fsPath)
 {
+	shader_t* self = (shader_t*)malloc(sizeof(shader_t));
+	assert(self);
 
-	GLuint self = glCreateProgram();
+	self->id = glCreateProgram();
 
 	GLuint vs = new_shader(GL_VERTEX_SHADER, read_file(vsPath));
 	GLuint fs = new_shader(GL_FRAGMENT_SHADER, read_file(fsPath));
 
-	glAttachShader(self, vs);
-	glAttachShader(self, fs);
-	glLinkProgram(self);
-	glValidateProgram(self);
+	glAttachShader(self->id, vs);
+	glAttachShader(self->id, fs);
+	glLinkProgram(self->id);
+	glValidateProgram(self->id);
 
-	glDetachShader(self, vs);
-	glDetachShader(self, fs);
+	glDetachShader(self->id, vs);
+	glDetachShader(self->id, fs);
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 
-	return &(Shader){self};
+	return self;
 }
 
-void ShaderTerminate(Shader* self)
+void shader_bind(shader_t* self)
 {
-	glDeleteShader(self->id);
+	glUseProgram(self->id);
+}
+
+void shader_unbind()
+{
+	glUseProgram(0);
+}
+
+void shader_terminate(shader_t* self)
+{
+	glDeleteProgram(self->id);
 	free(self);
 }
