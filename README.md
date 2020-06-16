@@ -35,17 +35,11 @@ Insight Init:
 ```c
 #include "Insight.h"
 
-void init(window_t* wnd) 
-{
-}
+void init(window_t* wnd) { /* Init all your variables and define specific behaviour here!!! */ }
 
-void update() 
-{
-}
+void update() { /* Update all your variables and define specific behaviour here!!! */ }
 
-void draw()
-{
-}
+void draw(){ /* Draw everything here!!! */ }
 
 void input(window_t* wnd)
 {
