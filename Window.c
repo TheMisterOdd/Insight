@@ -22,7 +22,7 @@ static void window_error_callback(int err, const char* desctiption)
 	fprintf(stderr, "Error: %d: %s\n", err, desctiption);
 }
 
-window_t* insight_new_window(int width, int height, const char* title, _Bool fullscreen)
+window_t* insight_window_init(int width, int height, const char* title, _Bool fullscreen)
 {
 	window_t* self = (window_t*)malloc(sizeof(window_t));
 	if (self == NULL)
@@ -52,7 +52,7 @@ window_t* insight_new_window(int width, int height, const char* title, _Bool ful
 	glfwSetFramebufferSizeCallback(self->wnd_hndl, window_resize_callback);
 	glfwSetErrorCallback(window_error_callback);
 
-	Insight_InputCreate(&self->input, self->wnd_hndl);
+	self->input = insight_input_init(self->wnd_hndl);
 
 	glfwMakeContextCurrent(self->wnd_hndl);
 
@@ -82,13 +82,13 @@ window_t* insight_new_window(int width, int height, const char* title, _Bool ful
 	return self;
 }
 
-_Bool insight_window_is_running(window_t* self)
+_Bool window_is_running(window_t* self)
 {
 	float currentTime = (float)glfwGetTime();
 	self->deltaTime = currentTime - self->lastTime;
 	self->lastTime = currentTime;
 
-	Insight_InputUpdate(&self->input);
+	input_update(self->input);
 
 	glFlush();
 	glfwSwapBuffers(self->wnd_hndl);
@@ -98,19 +98,19 @@ _Bool insight_window_is_running(window_t* self)
 	return !glfwWindowShouldClose(self->wnd_hndl);
 }
 
-void insight_window_set_size(window_t* self, int width, int height)
+void window_set_size(window_t* self, int width, int height)
 {
 	glfwSetWindowSize(self->wnd_hndl, width, height);
 	glfwSetWindowPos(self->wnd_hndl, (self->vidMode->width - width) / 2, (self->vidMode->height - height) / 2);
 }
 
-void insight_window_terminate(window_t* self)
+void window_terminate(window_t* self)
 {
-	Insight_InputTerminate(&self->input);
+	input_terminate(self->input);
 	glfwDestroyWindow(self->wnd_hndl);
 }
 
-GLFWcursor* insight_set_cursor(window_t* self, const char* path)
+GLFWcursor* window_set_cursor(window_t* self, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
@@ -122,7 +122,7 @@ GLFWcursor* insight_set_cursor(window_t* self, const char* path)
 	return cursor;
 }
 
-void insight_set_icon(window_t* self, const char* path)
+void window_set_icon(window_t* self, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);

@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#include <stdio.h>
+
 static window_t* insight_wnd;
 
 static char* CPU_INFO;
@@ -49,7 +51,7 @@ _Bool insight_init(const char* title)
 	{
 		return 0;
 	}
-	insight_wnd = insight_new_window(1280, 720, title, 0);
+	insight_wnd = insight_window_init(1280, 720, title, 0);
 	if (insight_wnd == NULL)
 		return 0;
 
@@ -60,7 +62,7 @@ _Bool insight_init(const char* title)
 
 void insight_update() 
 {
-	while (insight_window_is_running(insight_wnd))
+	while (window_is_running(insight_wnd))
 	{
 		printf("\rDisplay: %dx%d, FPS: %.0f", insight_wnd->width, insight_wnd->height, 1.0f / insight_wnd->deltaTime);
 		insight_update_ptr();
@@ -73,7 +75,7 @@ void insight_update()
 void insight_terminate() 
 {
 	insight_terminate_ptr();
-	insight_window_terminate(insight_wnd);
+	window_terminate(insight_wnd);
 }
 
 const char* insight_cpu_info()

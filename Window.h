@@ -20,8 +20,8 @@ typedef struct
 	float deltaTime;
 	float lastTime;
 
-	/*! Mouse and keyboard handeler. */
-	Insight_Input input;
+	/*! Mouse, keyboard and controller handeler. */
+	input_t* input;
 
 	/*! Window object. */
 	GLFWwindow* wnd_hndl;
@@ -32,21 +32,21 @@ typedef struct
 } window_t;
 
 /*! Returns a pointer to a window in memory */
-window_t* insight_new_window(int width, int height, const char* title, _Bool fullscreen);
+window_t* insight_window_init(int width, int height, const char* title, _Bool fullscreen);
 
 /*! Checks if the window is running or not */
-_Bool insight_window_is_running(window_t* self);
+_Bool window_is_running(window_t* self);
 
 /*! Sets new size of the window */
-void insight_window_set_size(window_t* self, int width, int height);
+void window_set_size(window_t* self, int width, int height);
 
 /*! The memory of the window is freed */
-void insight_window_terminate(window_t* self);
+void window_terminate(window_t* self);
 
 /*! Sets window cursor */
-GLFWcursor* insight_set_cursor(window_t* self, const char* path);
+GLFWcursor* window_set_cursor(window_t* self, const char* path);
 
 /*! Sets window icon */
-void insight_set_icon(window_t* self, const char* path);
+void window_set_icon(window_t* self, const char* path);
 
 #endif

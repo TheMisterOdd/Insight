@@ -1,9 +1,6 @@
 #ifndef _INPUT_H_
 #define _INPUT_H_
 
-#include <assert.h>
-#include <cglm/cglm.h>
-
 #include <GLFW/glfw3.h>
 
 typedef struct 
@@ -12,27 +9,27 @@ typedef struct
 	_Bool keys[GLFW_KEY_LAST];
 	_Bool mouseButtons[GLFW_MOUSE_BUTTON_LAST];
 
-} Insight_Input;
+} input_t;
 
-void Insight_InputCreate(Insight_Input* self, GLFWwindow* window);
+input_t* insight_input_init(GLFWwindow* window);
 
-_Bool Insight_IsKeyDown(Insight_Input* self, int key);
+_Bool input_is_key_down(input_t* self, int key);
 
-_Bool Insight_IsKeyPressed(Insight_Input* self, int key);
+_Bool input_is_key_pressed(input_t* self, int key);
 
-_Bool Insight_IsKeyReleased(Insight_Input* self, int key);
+_Bool input_is_key_released(input_t* self, int key);
 
-_Bool Insight_IsMouseButtonDown(Insight_Input* self, int button);
+_Bool input_is_mouse_button_down(input_t* self, int button);
 
-_Bool Insight_IsMouseButtonPressed(Insight_Input* self, int button);
+_Bool input_is_mouse_button_pressed(input_t* self, int button);
 
-_Bool Insight_IsMouseButtonReleased(Insight_Input* self, int button);
+_Bool input_is_mouse_button_released(input_t* self, int button);
 
-void Insight_GetMousePos(Insight_Input* self, double* x, double* y);
+void input_get_mouse_pos(input_t* self, double* x, double* y);
 
-void Insight_InputUpdate(Insight_Input* self);
+void input_update(input_t* self);
 
-void Insight_InputTerminate(Insight_Input* self);
+void input_terminate(input_t* self);
 
 #endif
 
