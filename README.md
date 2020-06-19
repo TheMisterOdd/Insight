@@ -39,7 +39,7 @@ void init(window_t* wnd) { /* Init all your variables and define specific behavi
 
 void update() { /* Update all your variables and define specific behaviour here!!! */ }
 
-void has_resized() { /* Check if has window has resized here!!! */ }
+void has_resized(int width, int height) { /* Check if has window has resized here!!! */ }
 
 void draw() { /* Draw everything here!!! */ }
 
