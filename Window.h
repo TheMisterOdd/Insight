@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Input.h"
+#include "Core.h"
 
 typedef struct
 {
@@ -32,21 +33,21 @@ typedef struct
 } window_t;
 
 /*! Returns a pointer to a window in memory */
-window_t* insight_window_init(int width, int height, const char* title, bool fullscreen);
+INSIGHT_API window_t* insight_window_init(int width, int height, const char* title, bool fullscreen);
 
 /*! Checks if the window is running or not */
-bool window_is_running(window_t* self);
+INSIGHT_API bool window_is_running(window_t* self);
 
 /*! Sets new size of the window */
-void window_set_size(window_t* self, int width, int height);
+INSIGHT_API void window_set_size(window_t* self, int width, int height);
 
 /*! The memory of the window is freed */
-void window_terminate(window_t* self);
+INSIGHT_API void window_terminate(window_t* self);
 
 /*! Sets window cursor */
-GLFWcursor* window_set_cursor(window_t* self, const char* path);
+INSIGHT_API GLFWcursor* window_set_cursor(window_t* self, const char* path);
 
 /*! Sets window icon */
-void window_set_icon(window_t* self, const char* path);
+INSIGHT_API void window_set_icon(window_t* self, const char* path);
 
 #endif

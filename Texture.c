@@ -5,11 +5,12 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
-texture_t* texture_init(const char* path)
+
+INSIGHT_API texture_t* texture_init(const char* path)
 {
 	printf("Loading new texture '%s'...\n", path);
 	texture_t* self = (texture_t*)malloc(sizeof(texture_t));
-	assert(self != NULL);
+	assert(self);
 
 	glGenTextures(1, &self->texture);
 
@@ -38,7 +39,7 @@ texture_t* texture_init(const char* path)
 	return self;
 }
 
-texture_t* texture_skybox_init(char** faces_files, unsigned int lenght)
+INSIGHT_API texture_t* texture_skybox_init(char** faces_files, unsigned int lenght)
 {
 	printf("Loading new skybox texture...\n");
 	texture_t* self = (texture_t*)malloc(sizeof(texture_t));
@@ -70,20 +71,18 @@ texture_t* texture_skybox_init(char** faces_files, unsigned int lenght)
 	return self;
 }
 
-
-
-void texture_bind(texture_t* self, unsigned int sampler)
+INSIGHT_API void texture_bind(texture_t* self, unsigned int sampler)
 {
 	glActiveTexture(GL_TEXTURE0 + sampler);
 	glBindTexture(GL_TEXTURE_2D, self->texture);
 }
 
-void texture_unbind()
+INSIGHT_API void texture_unbind()
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void texture_terminate(texture_t* self)
+INSIGHT_API void texture_terminate(texture_t* self)
 {
 	glDeleteTextures(1, &self->texture);
 	self->channels = 0;
@@ -93,7 +92,7 @@ void texture_terminate(texture_t* self)
 	free(self);
 }
 
-_Bool texture_make_screenshot()
+INSIGHT_API bool texture_make_screenshot()
 {
 	time_t t = time(NULL);
 	struct tm tm;

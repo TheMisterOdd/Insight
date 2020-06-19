@@ -1,29 +1,36 @@
 #ifndef _TEXTURE_H_
 #define _TEXTURE_H_
 
-#include "Window.h"
+#include "Core.h"
 
-
-
+#include <glad/glad.h>
+#include <stdbool.h>
 #include <time.h>
 
+/*! Texture type. */
 typedef struct
 {
 	int width, height, channels;
 	unsigned int texture;
 } texture_t;
 
-texture_t* texture_init(const char* path);
+/*! Returns a pointer to a texture object in memory. */
+INSIGHT_API texture_t* texture_init(const char* path);
 
-texture_t* texture_skybox_init(char** faces_files, unsigned int lenght);
+/*! Returns a pointer to a texture object for a skybox in memory. */
+INSIGHT_API texture_t* texture_skybox_init(char** faces_files, unsigned int lenght);
 
-void texture_bind(texture_t* self, unsigned int sampler);
+/*! Uses the given texture, for handeling it. */
+INSIGHT_API void texture_bind(texture_t* self, unsigned int sampler);
 
-void texture_unbind();
+/*! Stop using the current binded texture. */
+INSIGHT_API void texture_unbind();
 
-void texture_terminate(texture_t* self);
+/*! Delete the memory of the given texture. */
+INSIGHT_API void texture_terminate(texture_t* self);
 
-bool texture_make_screenshot();
+/*! Makes a screenshot an writes it into a png file. */
+INSIGHT_API bool texture_make_screenshot();
 
 #endif // !_TEXTURE_H_
 

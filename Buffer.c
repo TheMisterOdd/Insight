@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-vao_t* vao_init()
+INSIGHT_API vao_t* vao_init()
 {
 	vao_t* self = (vao_t*)malloc(sizeof(vao_t));
 	assert(self);
@@ -14,24 +14,24 @@ vao_t* vao_init()
 	return self;
 }
 
-void vao_bind(vao_t* self)
+INSIGHT_API void vao_bind(vao_t* self)
 {
 	glBindVertexArray(self->id);
 }
 
-void vao_unbind()
+INSIGHT_API void vao_unbind()
 {
 	glBindVertexArray(0);
 }
 
-void vao_terminate(vao_t* self)
+INSIGHT_API void vao_terminate(vao_t* self)
 {
 
 	glDeleteVertexArrays(1, &self->id);
 	free(self);
 }
 
-vbo_t* vbo_init(const void* data, GLsizeiptr size)
+INSIGHT_API vbo_t* vbo_init(const void* data, GLsizeiptr size)
 {
 	vbo_t* self = (vbo_t*)malloc(sizeof(vbo_t));
 	assert(self);
@@ -54,17 +54,17 @@ vbo_t* vbo_init(const void* data, GLsizeiptr size)
 	return self;
 }
 
-void vbo_bind(vbo_t* self)
+INSIGHT_API void vbo_bind(vbo_t* self)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, self->id);
 }
 
-void vbo_unbind()
+INSIGHT_API void vbo_unbind()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void vbo_terminate(vbo_t* self)
+INSIGHT_API void vbo_terminate(vbo_t* self)
 {
 	if (self == NULL)
 		return;
@@ -72,7 +72,7 @@ void vbo_terminate(vbo_t* self)
 	glDeleteBuffers(1, &self->id);
 }
 
-ibo_t* ibo_init(const void* data, GLsizeiptr count)
+INSIGHT_API ibo_t* ibo_init(const void* data, GLsizeiptr count)
 {
 	ibo_t* self = (ibo_t*)malloc(sizeof(ibo_t));
 	assert(self);
@@ -86,17 +86,17 @@ ibo_t* ibo_init(const void* data, GLsizeiptr count)
 	return self;
 }
 
-void ibo_bind(ibo_t* self)
+INSIGHT_API void ibo_bind(ibo_t* self)
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->id);
 }
 
-void ibo_unbind()
+INSIGHT_API void ibo_unbind()
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void ibo_terminate(ibo_t* self)
+INSIGHT_API void ibo_terminate(ibo_t* self)
 {
 	if (self == NULL)
 		return;
@@ -106,7 +106,7 @@ void ibo_terminate(ibo_t* self)
 	free(self);
 }
 
-fbo_t* fbo_init(int width, int height)
+INSIGHT_API fbo_t* fbo_init(int width, int height)
 {
 	fbo_t* self = (fbo_t*)malloc(sizeof(fbo_t));
 	assert(self);
@@ -120,8 +120,9 @@ fbo_t* fbo_init(int width, int height)
 	glGenTextures(1, &self->texture->texture);
 	glBindTexture(GL_TEXTURE_2D, self->texture->texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glGenFramebuffers(1, &self->fbo);
@@ -130,8 +131,8 @@ fbo_t* fbo_init(int width, int height)
 
 	glGenRenderbuffers(1, &self->rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, self->rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, self->rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, self->rbo);
 
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -145,14 +146,19 @@ fbo_t* fbo_init(int width, int height)
 	return self;
 }
 
-void fbo_set_into(fbo_t* self, void(*draw_into_func)(void))
+INSIGHT_API void fbo_bind(fbo_t* self)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, self->fbo);
-	draw_into_func();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, self->texture->width, self->texture->height);
 }
 
-void fbo_terminate(fbo_t* self)
+INSIGHT_API void fbo_unbind(int width, int height)
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, width, height);
+}
+
+INSIGHT_API void fbo_terminate(fbo_t* self)
 {
 	texture_terminate(self->texture);
 	glDeleteRenderbuffers(1, &self->rbo);

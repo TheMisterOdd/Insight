@@ -6,17 +6,17 @@
 
 static char* CPU_INFO;
 
-void (*insight_init_ptr)(window_t* wnd) = NULL;
+INSIGHT_API void (*insight_init_ptr)(window_t* wnd) = NULL;
 
-void (*insight_update_ptr)() = NULL;
+INSIGHT_API void (*insight_update_ptr)(window_t* wnd) = NULL;
 
-void (*insight_has_resized_ptr)(int new_width, int new_height) = NULL;
+INSIGHT_API void (*insight_has_resized_ptr)(int new_width, int new_height) = NULL;
 
-void (*insight_draw_ptr)(void) = NULL;
+INSIGHT_API void (*insight_draw_ptr)(void) = NULL;
 
-void (*insight_input_ptr)(window_t* wnd) = NULL;
+INSIGHT_API void (*insight_input_ptr)(window_t* wnd) = NULL;
 
-void (*insight_terminate_ptr)(void) = NULL;
+INSIGHT_API void (*insight_terminate_ptr)(void) = NULL;
 
 static int window_get_system_info()
 {
@@ -43,12 +43,12 @@ static int window_get_system_info()
 	return CPU_INFO != NULL ? 1 : 0;
 }
 
-_Bool insight_glfw_init()
+INSIGHT_API bool insight_glfw_init()
 {
 	return (!glfwInit() || !window_get_system_info());
 }
 
-void insight_engine(const char* appname, uint8_t flags)
+INSIGHT_API void insight_engine(const char* appname, uint8_t flags)
 {
 	if (insight_glfw_init()) 
 	{
@@ -65,13 +65,19 @@ void insight_engine(const char* appname, uint8_t flags)
 	/* --- User Init --- */
 	insight_init_ptr(wnd);
 
+	double time = glfwGetTime();
+
 	while (window_is_running(wnd))
 	{
-		printf("\rDisplay: %dx%d, FPS: %.0f", wnd->width, wnd->height, 1.0f / wnd->deltaTime);
+		if (glfwGetTime() - time > 0.25) 
+		{
+			printf("\rDisplay: %dx%d, FPS: %.0f  ", wnd->width, wnd->height, 1.0f / wnd->deltaTime);
+			time = glfwGetTime();
+		}
 		
 
 		/* --- User Loop Update --- */
-		insight_update_ptr();
+		insight_update_ptr(wnd);
 		insight_draw_ptr();
 		insight_input_ptr(wnd);
 	}
@@ -82,8 +88,7 @@ void insight_engine(const char* appname, uint8_t flags)
 	window_terminate(wnd);
 }
 
-
-const char* insight_cpu_info()
+INSIGHT_API const char* insight_cpu_info()
 {
 	return CPU_INFO;
 }

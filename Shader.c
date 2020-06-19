@@ -59,7 +59,7 @@ char* read_file(const char* path)
 }
 
 
-shader_t* shader_init(const char* vsPath, const char* fsPath)
+INSIGHT_API shader_t* shader_init(const char* vsPath, const char* fsPath)
 {
 	shader_t* self = (shader_t*)malloc(sizeof(shader_t));
 	assert(self);
@@ -82,17 +82,17 @@ shader_t* shader_init(const char* vsPath, const char* fsPath)
 	return self;
 }
 
-void shader_bind(shader_t* self)
+INSIGHT_API void shader_bind(shader_t* self)
 {
 	glUseProgram(self->id);
 }
 
-void shader_unbind()
+INSIGHT_API void shader_unbind()
 {
 	glUseProgram(0);
 }
 
-void shader_terminate(shader_t* self)
+INSIGHT_API void shader_terminate(shader_t* self)
 {
 	glDeleteProgram(self->id);
 	free(self);

@@ -21,7 +21,7 @@ static void window_error_callback(int err, const char* desctiption)
 	fprintf(stderr, "Error: %d: %s\n", err, desctiption);
 }
 
-window_t* insight_window_init(int width, int height, const char* title, bool fullscreen)
+INSIGHT_API window_t* insight_window_init(int width, int height, const char* title, bool fullscreen)
 {
 	window_t* self = (window_t*)malloc(sizeof(window_t));
 	if (self == NULL)
@@ -80,7 +80,7 @@ window_t* insight_window_init(int width, int height, const char* title, bool ful
 	return self;
 }
 
-bool window_is_running(window_t* self)
+INSIGHT_API bool window_is_running(window_t* self)
 {
 	float currentTime = (float)glfwGetTime();
 	self->deltaTime = currentTime - self->lastTime;
@@ -96,19 +96,19 @@ bool window_is_running(window_t* self)
 	return !glfwWindowShouldClose(self->wnd_hndl);
 }
 
-void window_set_size(window_t* self, int width, int height)
+INSIGHT_API void window_set_size(window_t* self, int width, int height)
 {
 	glfwSetWindowSize(self->wnd_hndl, width, height);
 	glfwSetWindowPos(self->wnd_hndl, (self->vidMode->width - width) / 2, (self->vidMode->height - height) / 2);
 }
 
-void window_terminate(window_t* self)
+INSIGHT_API void window_terminate(window_t* self)
 {
 	input_terminate(self->input);
 	glfwDestroyWindow(self->wnd_hndl);
 }
 
-GLFWcursor* window_set_cursor(window_t* self, const char* path)
+INSIGHT_API GLFWcursor* window_set_cursor(window_t* self, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
@@ -120,7 +120,7 @@ GLFWcursor* window_set_cursor(window_t* self, const char* path)
 	return cursor;
 }
 
-void window_set_icon(window_t* self, const char* path)
+INSIGHT_API void window_set_icon(window_t* self, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
