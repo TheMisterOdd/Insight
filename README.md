@@ -39,27 +39,23 @@ void init(window_t* wnd) { /* Init all your variables and define specific behavi
 
 void update() { /* Update all your variables and define specific behaviour here!!! */ }
 
-void draw(){ /* Draw everything here!!! */ }
+void has_resized() { /* Check if has window has resized here!!! */ }
 
-void input(window_t* wnd)
-{
-	if (input_is_key_pressed(wnd->input, GLFW_KEY_ESCAPE))
-	{
-		glfwSetWindowShouldClose(wnd->wnd_hndl, GLFW_TRUE);
-	}
-}
+void draw() { /* Draw everything here!!! */ }
 
-void terminate() 
-{
-}
+void input(window_t* wnd) { /* Check input here!!! */ }
+
+void terminate() { /* Delete memory here!!! */ }
 
 int main(void)
 {
-	insight_init_ptr      = (void*)init;
-	insight_update_ptr    = (void*)update;
-	insight_draw_ptr      = (void*)draw;
-	insight_input_ptr     = (void*)input;
-	insight_terminate_ptr = (void*)terminate;
+	insight_init_ptr        = (void*)init;
+	insight_update_ptr      = (void*)update;
+	insight_has_resized_ptr = (void*)has_resized;
+	insight_draw_ptr        = (void*)draw;
+	insight_input_ptr       = (void*)input;
+	insight_terminate_ptr   = (void*)terminate;
+	
 
 	insight_engine("Insight", 0);
 
