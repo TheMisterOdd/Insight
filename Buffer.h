@@ -1,6 +1,8 @@
 #ifndef _BUFFER_H_
 #define _BUFFER_H_
 
+#include "Texture.h"
+
 #include <glad/glad.h>
 
 /*! Vertex array object */
@@ -21,6 +23,14 @@ typedef struct
 	GLuint id;
 	GLsizeiptr count;
 } ibo_t;
+
+/*! Framebuffer object */
+typedef struct 
+{
+	texture_t* texture;
+	GLuint fbo, rbo;
+
+} fbo_t;
 
 /*! Returns a pointer to a vertex array object in memory */
 vao_t* vao_init();
@@ -62,6 +72,15 @@ void ibo_unbind();
 /*! Deletes the memory of the given index buffer object */
 void ibo_terminate(ibo_t* self);
 
+
+/*! Returns a pointer to a framebuffer object in memory */
+fbo_t* fbo_init(int width, int height);
+
+/*! Binds the buffer and use the given function for drawing inside the buffer */
+void fbo_set_into(fbo_t* self, void (*draw_into_func)(void));
+
+/*! Deletes the memory of the given framebuffer object */
+void fbo_terminate(fbo_t* self);
 
 #endif // !_BUFFER_H_
 

@@ -15,7 +15,7 @@ typedef struct
 	int height;
 
 	/*! The fullscreen, gives a value depending if the screen is on fullscreen or not. */
-	_Bool fullscreen;
+	bool fullscreen;
 
 	float deltaTime;
 	float lastTime;
@@ -32,10 +32,10 @@ typedef struct
 } window_t;
 
 /*! Returns a pointer to a window in memory */
-window_t* insight_window_init(int width, int height, const char* title, _Bool fullscreen);
+window_t* insight_window_init(int width, int height, const char* title, bool fullscreen);
 
 /*! Checks if the window is running or not */
-_Bool window_is_running(window_t* self);
+bool window_is_running(window_t* self);
 
 /*! Sets new size of the window */
 void window_set_size(window_t* self, int width, int height);

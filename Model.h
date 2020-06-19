@@ -11,8 +11,11 @@ typedef struct
 	ibo_t* ibo;
 } model_t;
 
-/*! Returns a pointer to a model in memory. */
-model_t* model_init();
+/*! Returns a pointer to a model in memory with indices. */
+model_t* model_init(const float* vertices, const GLuint* indices, GLsizeiptr vert_size, GLsizeiptr indices_count);
+
+/*! Returns a pointer to a model in memory without indices. */
+model_t* model_init_without_indices(const float* vertices, GLsizeiptr vert_size);
 
 /*! Starts using the given model, so the user can start managing the model. */
 void model_begin(model_t* self);
@@ -20,6 +23,8 @@ void model_begin(model_t* self);
 /*! Draw the model onto screen.
 NOTE: 'model_begin' and 'model_end', should be called before and after this function, respectively. */
 void model_draw(model_t* self);
+
+void model_draw_without_indices(model_t* self, GLsizeiptr count);
 
 /*! Stops using the current binded model, so the user cannot handle it anymore. */
 void model_end();

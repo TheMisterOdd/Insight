@@ -1,18 +1,16 @@
 #include "Insight.h"
 
-#include <malloc.h>
-#include <stddef.h>
-#include <string.h>
-
 #include <stdio.h>
-
-static window_t* insight_wnd;
+#include <stdlib.h>
+#include <string.h>
 
 static char* CPU_INFO;
 
 void (*insight_init_ptr)(window_t* wnd) = NULL;
 
-void (*insight_update_ptr)(void) = NULL;
+void (*insight_update_ptr)() = NULL;
+
+void (*insight_has_resized_ptr)(int new_width, int new_height) = NULL;
 
 void (*insight_draw_ptr)(void) = NULL;
 
@@ -50,38 +48,40 @@ _Bool insight_glfw_init()
 	return (!glfwInit() || !window_get_system_info());
 }
 
-_Bool insight_init(const char* title)
+void insight_engine(const char* appname, uint8_t flags)
 {
-	if (!glfwInit() || !window_get_system_info())
+	if (insight_glfw_init()) 
 	{
-		return 0;
+		fprintf(stderr, "[Error]: Cannot create a GLFW window context.");
+		return;
 	}
-	insight_wnd = insight_window_init(1280, 720, title, 0);
-	if (insight_wnd == NULL)
-		return 0;
-
-	insight_init_ptr(insight_wnd);
-
-	return 1;
-}
-
-void insight_update() 
-{
-	while (window_is_running(insight_wnd))
+	window_t* wnd = insight_window_init(1280, 720, appname, 0);
+	if (wnd == NULL) 
 	{
-		printf("\rDisplay: %dx%d, FPS: %.0f", insight_wnd->width, insight_wnd->height, 1.0f / insight_wnd->deltaTime);
+		fprintf(stderr, "[Error]: Cannot create a GLFW window context.");
+		goto terminate;
+	}
+	
+	/* --- User Init --- */
+	insight_init_ptr(wnd);
+
+	while (window_is_running(wnd))
+	{
+		printf("\rDisplay: %dx%d, FPS: %.0f", wnd->width, wnd->height, 1.0f / wnd->deltaTime);
+		
+
+		/* --- User Loop Update --- */
 		insight_update_ptr();
 		insight_draw_ptr();
-		insight_input_ptr(insight_wnd);
+		insight_input_ptr(wnd);
 	}
-}
 
-
-void insight_terminate() 
-{
+	/* --- User Terminate --- */
+	terminate:
 	insight_terminate_ptr();
-	window_terminate(insight_wnd);
+	window_terminate(wnd);
 }
+
 
 const char* insight_cpu_info()
 {

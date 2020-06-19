@@ -9,12 +9,11 @@
 #include <stb_image.h>
 #endif
 
-static _Bool has_resized = 0;
 
 static void window_resize_callback(GLFWwindow* window, int fbW, int fbH) 
 {
 	glViewport(0, 0, fbW, fbH);
-	has_resized = 1;
+	insight_has_resized_ptr(fbW, fbH);
 }
 
 static void window_error_callback(int err, const char* desctiption)
@@ -22,7 +21,7 @@ static void window_error_callback(int err, const char* desctiption)
 	fprintf(stderr, "Error: %d: %s\n", err, desctiption);
 }
 
-window_t* insight_window_init(int width, int height, const char* title, _Bool fullscreen)
+window_t* insight_window_init(int width, int height, const char* title, bool fullscreen)
 {
 	window_t* self = (window_t*)malloc(sizeof(window_t));
 	if (self == NULL)
@@ -66,8 +65,7 @@ window_t* insight_window_init(int width, int height, const char* title, _Bool fu
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	glEnable(GL_DEPTH_TEST);
 
 
 	printf(
@@ -82,7 +80,7 @@ window_t* insight_window_init(int width, int height, const char* title, _Bool fu
 	return self;
 }
 
-_Bool window_is_running(window_t* self)
+bool window_is_running(window_t* self)
 {
 	float currentTime = (float)glfwGetTime();
 	self->deltaTime = currentTime - self->lastTime;

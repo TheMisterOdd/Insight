@@ -76,7 +76,6 @@ void texture_bind(texture_t* self, unsigned int sampler)
 {
 	glActiveTexture(GL_TEXTURE0 + sampler);
 	glBindTexture(GL_TEXTURE_2D, self->texture);
-
 }
 
 void texture_unbind()

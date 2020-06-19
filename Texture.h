@@ -23,7 +23,7 @@ void texture_unbind();
 
 void texture_terminate(texture_t* self);
 
-_Bool texture_make_screenshot();
+bool texture_make_screenshot();
 
 #endif // !_TEXTURE_H_
 
