@@ -9,7 +9,7 @@
 typedef struct 
 {
 	GLFWwindow* window;
-	bool keys[GLFW_KEY_LAST];
+	bool keys[GLFW_KEY_LAST - 32];
 	bool mouseButtons[GLFW_MOUSE_BUTTON_LAST];
 
 } input_t;
@@ -39,4 +39,5 @@ INSIGHT_API void input_update(input_t* self);
 INSIGHT_API void input_terminate(input_t* self);
 
 #endif
+
 

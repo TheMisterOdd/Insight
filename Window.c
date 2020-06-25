@@ -13,12 +13,16 @@
 static void window_resize_callback(GLFWwindow* window, int fbW, int fbH) 
 {
 	glViewport(0, 0, fbW, fbH);
-	insight_has_resized_ptr(fbW, fbH);
+
+	if (insight_has_resized_ptr) 
+	{
+		insight_has_resized_ptr(_insight_objects, fbW, fbH);
+	}
 }
 
-static void window_error_callback(int err, const char* desctiption)
+static void window_error_callback(int err, const char* description)
 {
-	fprintf(stderr, "Error: %d: %s\n", err, desctiption);
+	fprintf(stderr, "Error: %d: %s\n", err, description);
 }
 
 INSIGHT_API window_t* insight_window_init(int width, int height, const char* title, bool fullscreen)
@@ -39,6 +43,7 @@ INSIGHT_API window_t* insight_window_init(int width, int height, const char* tit
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 
 	self->wnd_hndl = glfwCreateWindow(width, height, title, fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL);
 	if (self->wnd_hndl == NULL)

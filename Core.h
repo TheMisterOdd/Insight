@@ -2,7 +2,7 @@
 #define _CORE_H_
 
 #ifdef _WIN32
-#define INSIGHT_API __declspec(dllexport)
+#define INSIGHT_API
 #else
 #define INSIGHT_API 
 #endif

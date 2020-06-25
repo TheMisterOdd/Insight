@@ -1,11 +1,16 @@
 #ifndef _WINDOW_H_
 #define _WINDOW_H_
 
+#define GLFW_DLL
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "Input.h"
 #include "Core.h"
+
+#define WINDOW_DEFAULT_WIDTH 1280
+#define WINDOW_DEFAULT_HEIGHT 720
 
 typedef struct
 {

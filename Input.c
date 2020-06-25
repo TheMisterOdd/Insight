@@ -51,12 +51,13 @@ INSIGHT_API void input_get_mouse_pos(input_t* self, double* x, double* y)
 
 INSIGHT_API void input_update(input_t* self)
 {
-	for (int i = 32; i < GLFW_KEY_LAST; i++)
+	int i;
+	for (i = 32; i < GLFW_KEY_LAST; i++)
 	{
-		self->keys[i] = input_is_key_down(self, i);
+		self->keys[i - 32] = input_is_key_down(self, i);
 	}
 
-	for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++)
+	for (i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++)
 	{
 
 		self->mouseButtons[i] = input_is_mouse_button_down(self, i);
