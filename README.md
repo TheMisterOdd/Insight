@@ -14,8 +14,8 @@ This library is written in a single header file, there is no need of buildage.
 
 You would need to implement the headers files like this:
 ```c
-#define INSIGHT_WINDOW_IMPL
-#include "Window.h" /* Implements all the window functions */
+#define INSIGHT_WINDOW_IMPL /* Implements all the window functions */
+#include "Window.h" 
 ```
 
 ## Examples
