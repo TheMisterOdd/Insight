@@ -46,7 +46,6 @@ INSIGHT_API extern void (*insight_input_ptr)(void* objects, window_t* wnd);
 INSIGHT_API extern void (*insight_terminate_ptr)(void* objects);
 
 /*! Pointer. */
-INSIGHT_API void* _insight_objects;
 
 #endif /* !_INSIGHT_H_ */
 
@@ -75,8 +74,6 @@ INSIGHT_API void (*insight_draw_ptr)(void*, window_t*) = NULL;
 INSIGHT_API void (*insight_input_ptr)(void*, window_t*) = NULL;
 
 INSIGHT_API void (*insight_terminate_ptr)(void*) = NULL;
-
-INSIGHT_API void* _insight_objects = NULL;
 
 
 static int window_get_system_info()
@@ -116,7 +113,6 @@ INSIGHT_API bool insight_glfw_init()
 
 INSIGHT_API void insight_engine(void* objects, const char* appname, uint8_t flags)
 {
-	_insight_objects = objects;
 	if (insight_glfw_init())
 	{
 		fprintf(stderr, "[Error]: Cannot create a GLFW window context.");
@@ -127,6 +123,9 @@ INSIGHT_API void insight_engine(void* objects, const char* appname, uint8_t flag
 	if (flags & FULLSCREEN) {
 		if_fullscreen = true;
 	}
+
+	__objects = objects;
+
 	window_t* wnd = insight_window_init(WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, appname, if_fullscreen);
 
 
@@ -141,6 +140,11 @@ INSIGHT_API void insight_engine(void* objects, const char* appname, uint8_t flag
 	if (insight_init_ptr)
 	{
 		insight_init_ptr(objects, wnd);
+	}
+
+	if (insight_has_resized_ptr) 
+	{
+		window_has_resized_ptr = insight_has_resized_ptr;
 	}
 
 	double time = glfwGetTime();

@@ -32,6 +32,13 @@ INSIGHT_API void texture_terminate(texture_t* self);
 /*! Makes a screenshot an writes it into a png file. */
 INSIGHT_API bool texture_make_screenshot();
 
+/*! Sets window cursor */
+INSIGHT_API GLFWcursor* texture_set_window_cursor(window_t* self, const char* path);
+
+/*! Sets window icon */
+INSIGHT_API void texture_set_window_icon(window_t* self, const char* path);
+
+
 #endif /* !_TEXTURE_H_ */
 
 /*
@@ -42,6 +49,7 @@ INSIGHT_API bool texture_make_screenshot();
  * ===============================================================
  */
 #ifdef INSIGHT_TEXTURE_IMPL
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -169,6 +177,29 @@ INSIGHT_API bool texture_make_screenshot()
 
 	return saved;
 }
+
+INSIGHT_API GLFWcursor* texture_set_window_cursor(window_t* self, const char* path)
+{
+	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
+	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
+	GLFWcursor* cursor = glfwCreateCursor(image, 0, 0);
+
+	glfwSetCursor(self->wnd_hndl, cursor);
+	free(image);
+
+	return cursor;
+}
+
+INSIGHT_API void texture_set_window_icon(window_t* self, const char* path)
+{
+	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
+	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
+	glfwSetWindowIcon(self->wnd_hndl, 1, image);
+
+	free(image);
+}
+
+
 
 #endif /* INSIGHT_TEXTURE_IMPL */
 
