@@ -1,5 +1,5 @@
 # Insight
-Insight is lightweight game engine and framework written in ANSI C and licensed under public domain. The engine is designed to be fast and could be used in any project and it could be easily implemented in C++. The only dependecies it needs are an OpenGL library and `stb_image` and `stb_image_write header` files.
+Insight is **lightweight game engine and framework** written in **ANSI C** and licensed under public domain. The engine is designed to be fast and could be used in any project and it could be easily implemented with C++. The only dependecies it needs are an OpenGL library and `stb_image` and `stb_image_write header` files.
 
 ## Features:
 * Lightweight 
@@ -15,7 +15,7 @@ This library is written in a single header file, there is no need of buildage.
 You would need to implement the headers files like this:
 ```c
 #define INSIGHT_WINDOW_IMPL
-#include "Window.h"		/* Implements all the window functions */
+#include "Window.h" /* Implements all the window functions */
 ```
 
 ## Examples
