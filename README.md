@@ -1,9 +1,15 @@
 # Insight
-### 3D cross-platform game framework
 Insight is lightweight game engine and framework written in ANSI C and licensed under public domain. The engine is designed to be fast and could be used in any project and it could be easily implemented in C++. The only dependecies it needs are an OpenGL library and `stb_image` and `stb_image_write header` files.
 
-### Free and open source
-Insight is completely free and open source with no licence. No strings attached, no royalties, nothing. The users' games are theirs, down to the last line of engine code. We don't want to make profit from this project.
+## Features:
+* Lightweight 
+* Use only what you need
+* Written in C89, ANSI C
+* Small codebase (~1kLOC)
+* Simple and portable
+* Documentation (In development)
+
+
 
 ### Example code
 Easy init:
