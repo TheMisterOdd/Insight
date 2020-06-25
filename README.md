@@ -32,14 +32,7 @@ void draw() {
 
 int main(void)
 {
-	insight_init_ptr        = (void*)init;
-	insight_update_ptr      = (void*)update;
-	insight_has_resized_ptr = (void*)has_resized;
 	insight_draw_ptr        = (void*)draw;
-	insight_input_ptr       = (void*)input;
-	insight_terminate_ptr   = (void*)terminate;
-	
-
 	insight_engine(NULL, "Insight", 0);
 
 	return 0;
