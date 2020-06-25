@@ -9,32 +9,16 @@ Insight is lightweight game engine and framework written in ANSI C and licensed 
 * Simple and portable
 * Documentation (In development)
 
+## Building
+This library is written in a single header file, there is no need of buildage.
 
-
-### Example code
-Easy init:
+You would need to implement the headers files like this:
 ```c
-#include "Insight.h"
-#include "Window.h"
-
-int main(void) {
-   
-   insight_glfw_init();
-   window_t* wnd = insight_window_init(1280, 720, "OpenGL", false);
-   assert(wnd);
-   
-   while (window_is_running(wnd)) {
-
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-
-    }
-    
-    window_terminate(wnd);
-    return 0;
-}
+#define INSIGHT_WINDOW_IMPL
+#include "Window.h"		/* Implements all the window functions */
 ```
 
+## Examples
 Insight Init:
 ```c
 #include "Insight.h"
