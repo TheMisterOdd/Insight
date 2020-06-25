@@ -23,17 +23,12 @@ Insight Init:
 ```c
 #include "Insight.h"
 
-void init(window_t* wnd) { /* Init all your variables and define specific behaviour here!!! */ }
-
-void update() { /* Update all your variables and define specific behaviour here!!! */ }
-
-void has_resized(int width, int height) { /* Check if has window has resized here!!! */ }
-
-void draw() { /* Draw everything here!!! */ }
-
-void input(window_t* wnd) { /* Check input here!!! */ }
-
-void terminate() { /* Delete memory here!!! */ }
+void draw() { 
+	
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	
+}
 
 int main(void)
 {
@@ -45,7 +40,7 @@ int main(void)
 	insight_terminate_ptr   = (void*)terminate;
 	
 
-	insight_engine("Insight", 0);
+	insight_engine(NULL, "Insight", 0);
 
 	return 0;
 }
