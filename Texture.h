@@ -32,7 +32,7 @@ INSIGHT_API void texture_terminate(texture_t* self);
 /*! Makes a screenshot an writes it into a png file. */
 INSIGHT_API bool texture_make_screenshot();
 
-#endif // !_TEXTURE_H_
+#endif /* !_TEXTURE_H_ */
 
 /*
  * ==============================================================
@@ -149,7 +149,7 @@ INSIGHT_API bool texture_make_screenshot()
 	int width = viewport[2];
 	int height = viewport[3];
 
-	unsigned char* data = (unsigned char*)malloc((size_t)(width * height * 3)); // 3 components (R, G, B)
+	unsigned char* data = (unsigned char*)malloc((size_t)(width * height * 3)); /* 3 components (R, G, B) */
 
 	if (!data)
 		return 0;
@@ -170,7 +170,7 @@ INSIGHT_API bool texture_make_screenshot()
 	return saved;
 }
 
-#endif // INSIGHT_TEXTURE_IMPL
+#endif /* INSIGHT_TEXTURE_IMPL */
 
 
 

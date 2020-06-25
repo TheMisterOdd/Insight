@@ -21,7 +21,7 @@ INSIGHT_API void shader_unbind();
 /*! Deletes the memory of the given shader. */
 INSIGHT_API void shader_terminate(shader_t* self);
 
-#endif
+#endif /* !_SHADER_H_ */
 
 /*
  * ==============================================================
@@ -59,7 +59,7 @@ char* read_file(const char* path)
 	char* buffer = NULL;
 	long length;
 	FILE* f = NULL;
-	fopen_s(&f, path, "rb"); //was "rb"
+	fopen_s(&f, path, "rb"); /* was "rb" */
 	assert(f != NULL);
 
 	if (f)
@@ -125,6 +125,6 @@ INSIGHT_API void shader_terminate(shader_t* self)
 	free(self);
 }
 
-#endif // INSIGHT_SHADER_IMPL
+#endif /* INSIGHT_SHADER_IMPL */
 
 

@@ -85,7 +85,7 @@ INSIGHT_API void fbo_unbind(int width, int height);
 /*! Deletes the memory of the given framebuffer object */
 INSIGHT_API void fbo_terminate(fbo_t* self);
 
-#endif // !_BUFFER_H_
+#endif /* !_BUFFER_H_ */
 
 
 /*
@@ -263,4 +263,4 @@ INSIGHT_API void fbo_terminate(fbo_t* self)
 	free(self);
 }
 
-#endif
+#endif /* INSIGHT_BUFFER_IMPL */

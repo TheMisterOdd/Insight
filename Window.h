@@ -5,9 +5,10 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <stdbool.h>
 
-#include "Input.h"
 #include "Core.h"
+#include "Input.h"
 
 #define WINDOW_DEFAULT_WIDTH 1280
 #define WINDOW_DEFAULT_HEIGHT 720
@@ -55,4 +56,15 @@ INSIGHT_API GLFWcursor* window_set_cursor(window_t* self, const char* path);
 /*! Sets window icon */
 INSIGHT_API void window_set_icon(window_t* self, const char* path);
 
-#endif
+#endif /* !_WINDOW_H_ */
+
+/*
+ * ==============================================================
+ *
+ *                          IMPLEMENTATION
+ *
+ * ===============================================================
+ */
+#ifdef INSIGHT_WINDOW_IMPL
+
+#endif /* !INSIGHT_WINDOW_IMPL */

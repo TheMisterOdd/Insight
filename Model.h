@@ -33,7 +33,7 @@ INSIGHT_API void model_end();
 /*! Deletes the memory of the given model. */
 INSIGHT_API void model_terminate(model_t* self);
 
-#endif // !_MODEL_H_
+#endif /* !_MODEL_H_ */
 
 /*
  * ==============================================================
@@ -118,5 +118,5 @@ INSIGHT_API void model_terminate(model_t* self)
 	free(self);
 }
 
-#endif // INSIGHT_MODEL_IMPL
+#endif /* !INSIGHT_MODEL_IMPL */
 

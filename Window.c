@@ -1,23 +1,15 @@
 #include "Window.h"
-#include "Insight.h"
 
 #include <stdio.h>
 #include <malloc.h>
 
-#ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-#endif
 
-
-static void window_resize_callback(GLFWwindow* window, int fbW, int fbH) 
+static void window_resize_callback(GLFWwindow* window, int fbW, int fbH)
 {
 	glViewport(0, 0, fbW, fbH);
 
-	if (insight_has_resized_ptr) 
-	{
-		insight_has_resized_ptr(_insight_objects, fbW, fbH);
-	}
 }
 
 static void window_error_callback(int err, const char* description)
@@ -66,7 +58,7 @@ INSIGHT_API window_t* insight_window_init(int width, int height, const char* tit
 		return NULL;
 	}
 
-	// OpenGL Related:
+	/* OpenGL Related: */
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -133,3 +125,5 @@ INSIGHT_API void window_set_icon(window_t* self, const char* path)
 
 	free(image);
 }
+
+
