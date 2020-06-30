@@ -23,7 +23,7 @@ Insight Init:
 ```c
 #include "Insight.h"
 
-void draw() { 
+void draw(void* objects, struct window_t* wnd) { 
 	
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
@@ -32,8 +32,8 @@ void draw() {
 
 int main(void)
 {
-	insight_draw_ptr        = (void*)draw;
-	insight_engine(NULL, "Insight", 0);
+	insight_set_draw_func(draw)
+	insight_init_engine(NULL, "Insight", 0);
 
 	return 0;
 }
