@@ -32,7 +32,7 @@ void draw(void* objects, struct window_t* wnd) {
 
 int main(void)
 {
-	insight_set_draw_func(draw)
+	insight_set_draw_func(draw);
 	insight_init_engine(NULL, "Insight", 0);
 
 	return 0;
