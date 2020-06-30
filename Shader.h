@@ -4,24 +4,23 @@
 #include "Core.h"
 #include <glad/glad.h>
 
-typedef struct 
+struct shader_t
 {
 	GLuint id;
-} shader_t;
+};
 
 /*! Returns a pointer to a shader object in memory. */
-INSIGHT_API shader_t* shader_init(const char* vsPath, const char* fsPath);
+INSIGHT_API struct shader_t* shader_init(const char* vsPath, const char* fsPath);
 
 /*! Binds the given shader, so the user can use it. */
-INSIGHT_API void shader_bind(shader_t* self);
+INSIGHT_API void shader_bind(struct shader_t* self);
 
 /*! Unbinds the current binded shader, so it cannot be used anymore. */
 INSIGHT_API void shader_unbind();
 
 /*! Deletes the memory of the given shader. */
-INSIGHT_API void shader_terminate(shader_t* self);
+INSIGHT_API void shader_finalize(struct shader_t* self);
 
-#endif /* !_SHADER_H_ */
 
 /*
  * ==============================================================
@@ -86,9 +85,9 @@ char* read_file(const char* path)
 }
 
 
-INSIGHT_API shader_t* shader_init(const char* vsPath, const char* fsPath)
+INSIGHT_API struct shader_t* shader_init(const char* vsPath, const char* fsPath)
 {
-	shader_t* self = (shader_t*)malloc(sizeof(shader_t));
+	struct shader_t* self = (struct shader_t*)malloc(sizeof(struct shader_t));
 	assert(self);
 
 	self->id = glCreateProgram();
@@ -109,7 +108,7 @@ INSIGHT_API shader_t* shader_init(const char* vsPath, const char* fsPath)
 	return self;
 }
 
-INSIGHT_API void shader_bind(shader_t* self)
+INSIGHT_API void shader_bind(struct shader_t* self)
 {
 	glUseProgram(self->id);
 }
@@ -119,7 +118,7 @@ INSIGHT_API void shader_unbind()
 	glUseProgram(0);
 }
 
-INSIGHT_API void shader_terminate(shader_t* self)
+INSIGHT_API void shader_finalize(struct shader_t* self)
 {
 	glDeleteProgram(self->id);
 	free(self);
@@ -127,4 +126,5 @@ INSIGHT_API void shader_terminate(shader_t* self)
 
 #endif /* INSIGHT_SHADER_IMPL */
 
+#endif /* !_SHADER_H_ */
 

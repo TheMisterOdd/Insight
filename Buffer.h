@@ -6,86 +6,84 @@
 
 
 /*! Vertex array object */
-typedef struct
+struct vao_t
 {
 	GLuint id;
-} vao_t;
+};
 
 /*! Vertex buffer object */
-typedef struct
+struct vbo_t
 {
 	GLuint id;
-} vbo_t;
+};
 
 /*! Index buffer object */
-typedef struct
+struct ibo_t
 {
 	GLuint id;
 	GLsizeiptr count;
-} ibo_t;
+};
 
 /*! Framebuffer object */
-typedef struct 
+struct fbo_t
 {
-	texture_t* texture;
+	struct texture_t* texture;
 	GLuint fbo, rbo;
 
-} fbo_t;
+};
 
 /*! Returns a pointer to a vertex array object in memory */
-INSIGHT_API vao_t* vao_init();
+INSIGHT_API struct vao_t* vao_init();
 
 /*! Binds the given vertex array object, in order to use it */
-INSIGHT_API void vao_bind(vao_t* self);
+INSIGHT_API void vao_bind(struct vao_t* self);
 
 /*! Unbinds the current binded vertex array object */
 INSIGHT_API void vao_unbind();
 
 /*! Deletes the memory of the given vertex array object */
-INSIGHT_API void vao_terminate(vao_t* self);
+INSIGHT_API void vao_finalize(struct vao_t* self);
 
 /*! Returns a pointer to a vertex buffer object in memory
 NOTE: The given array should have a three component value for position per vertex 
 and a two component value for texture cordinates per vertex.
 In case that you don't want this layout, you must set up your own model and buffer class.*/
-INSIGHT_API vbo_t* vbo_init(const void* data, GLsizeiptr size);
+INSIGHT_API struct vbo_t* vbo_init(const void* data, GLsizeiptr size);
 
 /*! Binds the given vertex buffer object, in order to use it */
-INSIGHT_API void vbo_bind(vbo_t* self);
+INSIGHT_API void vbo_bind(struct vbo_t* self);
 
 /*! Unbinds the current binded vertex buffer object */
 INSIGHT_API void vbo_unbind();
 
 /*! Deletes the memory of the given vertex buffer object */
-INSIGHT_API void vbo_terminate(vbo_t* self);
+INSIGHT_API void vbo_finalize(struct vbo_t* self);
 
 
 /*! Returns a pointer to a index buffer object in memory */
-INSIGHT_API ibo_t* ibo_init(const void* data, GLsizeiptr count);
+INSIGHT_API struct ibo_t* ibo_init(const void* data, GLsizeiptr count);
 
 /*! Binds the given index buffer object, in order to use it */
-INSIGHT_API void ibo_bind(ibo_t* self);
+INSIGHT_API void ibo_bind(struct ibo_t* self);
 
 /*! Unbinds the current binded index buffer object */
 INSIGHT_API void ibo_unbind();
 
 /*! Deletes the memory of the given index buffer object */
-INSIGHT_API void ibo_terminate(ibo_t* self);
+INSIGHT_API void ibo_finalize(struct ibo_t* self);
 
 
 /*! Returns a pointer to a framebuffer object in memory */
-INSIGHT_API fbo_t* fbo_init(int width, int height);
+INSIGHT_API struct fbo_t* fbo_init(int width, int height);
 
 /*! Binds the buffer for handeling it. */
-INSIGHT_API void fbo_bind(fbo_t* self);
+INSIGHT_API void fbo_bind(struct fbo_t* self);
 
 /*! Unbinds the current binded buffer. */
 INSIGHT_API void fbo_unbind(int width, int height);
 
 /*! Deletes the memory of the given framebuffer object */
-INSIGHT_API void fbo_terminate(fbo_t* self);
-
-#endif /* !_BUFFER_H_ */
+INSIGHT_API void fbo_finalize(struct fbo_t* self);
 
 
 /*
@@ -101,9 +99,9 @@ INSIGHT_API void fbo_terminate(fbo_t* self);
 #include <assert.h>
 #include <stdio.h>
 
-INSIGHT_API vao_t* vao_init()
+INSIGHT_API struct vao_t* vao_init()
 {
-	vao_t* self = (vao_t*)malloc(sizeof(vao_t));
+	struct vao_t* self = (struct vao_t*)malloc(sizeof(struct vao_t));
 	assert(self);
 
 	glGenVertexArrays(1, &self->id);
@@ -111,7 +109,7 @@ INSIGHT_API vao_t* vao_init()
 	return self;
 }
 
-INSIGHT_API void vao_bind(vao_t* self)
+INSIGHT_API void vao_bind(struct vao_t* self)
 {
 	glBindVertexArray(self->id);
 }
@@ -121,15 +119,15 @@ INSIGHT_API void vao_unbind()
 	glBindVertexArray(0);
 }
 
-INSIGHT_API void vao_terminate(vao_t* self)
+INSIGHT_API void vao_finalize(struct vao_t* self)
 {
 	glDeleteVertexArrays(1, &self->id);
 	free(self);
 }
 
-INSIGHT_API vbo_t* vbo_init(const void* data, GLsizeiptr size)
+INSIGHT_API struct vbo_t* vbo_init(const void* data, GLsizeiptr size)
 {
-	vbo_t* self = (vbo_t*)malloc(sizeof(vbo_t));
+	struct vbo_t* self = (struct vbo_t*)malloc(sizeof(struct vbo_t));
 	assert(self);
 
 	glGenBuffers(1, &self->id);
@@ -150,7 +148,7 @@ INSIGHT_API vbo_t* vbo_init(const void* data, GLsizeiptr size)
 	return self;
 }
 
-INSIGHT_API void vbo_bind(vbo_t* self)
+INSIGHT_API void vbo_bind(struct vbo_t* self)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, self->id);
 }
@@ -160,7 +158,7 @@ INSIGHT_API void vbo_unbind()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-INSIGHT_API void vbo_terminate(vbo_t* self)
+INSIGHT_API void vbo_finalize(struct vbo_t* self)
 {
 	if (self == NULL)
 		return;
@@ -168,9 +166,9 @@ INSIGHT_API void vbo_terminate(vbo_t* self)
 	glDeleteBuffers(1, &self->id);
 }
 
-INSIGHT_API ibo_t* ibo_init(const void* data, GLsizeiptr count)
+INSIGHT_API struct ibo_t* ibo_init(const void* data, GLsizeiptr count)
 {
-	ibo_t* self = (ibo_t*)malloc(sizeof(ibo_t));
+	struct ibo_t* self = (struct ibo_t*)malloc(sizeof(struct ibo_t));
 	assert(self);
 
 	self->count = count;
@@ -182,7 +180,7 @@ INSIGHT_API ibo_t* ibo_init(const void* data, GLsizeiptr count)
 	return self;
 }
 
-INSIGHT_API void ibo_bind(ibo_t* self)
+INSIGHT_API void ibo_bind(struct ibo_t* self)
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->id);
 }
@@ -192,7 +190,7 @@ INSIGHT_API void ibo_unbind()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-INSIGHT_API void ibo_terminate(ibo_t* self)
+INSIGHT_API void ibo_finalize(struct ibo_t* self)
 {
 	if (self == NULL)
 		return;
@@ -202,12 +200,12 @@ INSIGHT_API void ibo_terminate(ibo_t* self)
 	free(self);
 }
 
-INSIGHT_API fbo_t* fbo_init(int width, int height)
+INSIGHT_API struct fbo_t* fbo_init(int width, int height)
 {
-	fbo_t* self = (fbo_t*)malloc(sizeof(fbo_t));
+	struct fbo_t* self = (struct fbo_t*)malloc(sizeof(struct fbo_t));
 	assert(self);
 
-	self->texture = (texture_t*)malloc(sizeof(texture_t));
+	self->texture = (struct texture_t*)malloc(sizeof(struct texture_t));
 	assert(self->texture);
 
 	self->texture->width = width;
@@ -243,7 +241,7 @@ INSIGHT_API fbo_t* fbo_init(int width, int height)
 	return self;
 }
 
-INSIGHT_API void fbo_bind(fbo_t* self)
+INSIGHT_API void fbo_bind(struct fbo_t* self)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, self->fbo);
 	glViewport(0, 0, self->texture->width, self->texture->height);
@@ -255,12 +253,16 @@ INSIGHT_API void fbo_unbind(int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-INSIGHT_API void fbo_terminate(fbo_t* self)
+INSIGHT_API void fbo_finalize(struct fbo_t* self)
 {
-	texture_terminate(self->texture);
+	texture_finalize(self->texture);
 	glDeleteRenderbuffers(1, &self->rbo);
 	glDeleteFramebuffers(1, &self->fbo);
 	free(self);
 }
 
 #endif /* INSIGHT_BUFFER_IMPL */
+
+#endif /* !_BUFFER_H_ */
+
+

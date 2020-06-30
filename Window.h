@@ -12,7 +12,7 @@
 #define WINDOW_DEFAULT_WIDTH 1280
 #define WINDOW_DEFAULT_HEIGHT 720
 
-typedef struct
+struct window_t
 {
 	/*! The width, in screen coordinates. */
 	int width;
@@ -23,8 +23,7 @@ typedef struct
 	/*! The fullscreen, gives a value depending if the screen is on fullscreen or not. */
 	bool fullscreen;
 
-	float deltaTime;
-	float lastTime;
+	double deltaTime, lastTime;
 
 	/*! Mouse, keyboard and controller handeler. */
 	input_t* input;
@@ -35,25 +34,21 @@ typedef struct
 	/*! Video mode type. */
 	const GLFWvidmode* vidMode;
 
-} window_t;
+};
 
 /*! Returns a pointer to a window in memory */
-INSIGHT_API window_t* insight_window_init(int width, int height, const char* title, bool fullscreen);
+INSIGHT_API struct window_t* window_init(int width, int height, const char* title, bool fullscreen);
 
 /*! Checks if the window is running or not */
-INSIGHT_API bool window_is_running(window_t* self);
+INSIGHT_API bool window_is_running(struct window_t* self);
 
 /*! Sets new size of the window */
-INSIGHT_API void window_set_size(window_t* self, int width, int height);
+INSIGHT_API void window_set_size(struct window_t* self, int width, int height);
 
 /*! The memory of the window is freed */
-INSIGHT_API void window_terminate(window_t* self);
+INSIGHT_API void window_finalize(struct window_t* self);
 
-INSIGHT_API extern void (*window_has_resized_ptr)(void* objects, int width, int height);
-
-
-#endif /* !_WINDOW_H_ */
-
+INSIGHT_API bool window_has_resized;
 /*
  * ==============================================================
  *
@@ -63,18 +58,10 @@ INSIGHT_API extern void (*window_has_resized_ptr)(void* objects, int width, int 
  */
 #ifdef INSIGHT_WINDOW_IMPL
 
-INSIGHT_API void (*window_has_resized_ptr)(void* objects, int width, int height) = NULL;
-
-void* __objects = NULL;
-
 static void window_resize_callback(GLFWwindow* window, int fbW, int fbH)
 {
 	glViewport(0, 0, fbW, fbH);
-	
-	if (window_has_resized_ptr) 
-	{
-		window_has_resized_ptr(__objects, fbW, fbH);
-	}
+	window_has_resized = true;
 }
 
 static void window_error_callback(int err, const char* description)
@@ -83,9 +70,9 @@ static void window_error_callback(int err, const char* description)
 }
 
 
-INSIGHT_API window_t* insight_window_init(int width, int height, const char* title, bool fullscreen)
+INSIGHT_API struct window_t* window_init(int width, int height, const char* title, bool fullscreen)
 {
-	window_t* self = (window_t*)malloc(sizeof(window_t));
+	struct window_t* self = (struct window_t*)malloc(sizeof(struct window_t));
 	if (self == NULL)
 	{
 		fprintf(stderr, "[Error]: 'Insight_Window*', cannot be 'NULL'. File: %s:%d\n", __FILE__, __LINE__);
@@ -114,7 +101,7 @@ INSIGHT_API window_t* insight_window_init(int width, int height, const char* tit
 	glfwSetFramebufferSizeCallback(self->wnd_hndl, window_resize_callback);
 	glfwSetErrorCallback(window_error_callback);
 
-	self->input = insight_input_init(self->wnd_hndl);
+	self->input = Input(self->wnd_hndl);
 
 	glfwMakeContextCurrent(self->wnd_hndl);
 
@@ -142,13 +129,13 @@ INSIGHT_API window_t* insight_window_init(int width, int height, const char* tit
 	return self;
 }
 
-INSIGHT_API bool window_is_running(window_t* self)
+INSIGHT_API bool window_is_running(struct window_t* self)
 {
-	float currentTime = (float)glfwGetTime();
+	double currentTime = glfwGetTime();
 	self->deltaTime = currentTime - self->lastTime;
 	self->lastTime = currentTime;
 
-	input_update(self->input);
+	Input_Update(self->input);
 
 	glFlush();
 	glfwSwapBuffers(self->wnd_hndl);
@@ -158,17 +145,20 @@ INSIGHT_API bool window_is_running(window_t* self)
 	return !glfwWindowShouldClose(self->wnd_hndl);
 }
 
-INSIGHT_API void window_set_size(window_t* self, int width, int height)
+INSIGHT_API void window_set_size(struct window_t* self, int width, int height)
 {
 	glfwSetWindowSize(self->wnd_hndl, width, height);
 	glfwSetWindowPos(self->wnd_hndl, (self->vidMode->width - width) / 2, (self->vidMode->height - height) / 2);
 }
 
-INSIGHT_API void window_terminate(window_t* self)
+INSIGHT_API void window_finalize(struct window_t* self)
 {
-	input_terminate(self->input);
+	Input_Finalize(self->input);
 	glfwDestroyWindow(self->wnd_hndl);
 }
 
 
 #endif /* !INSIGHT_WINDOW_IMPL */
+
+#endif /* !_WINDOW_H_ */
+

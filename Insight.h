@@ -18,36 +18,46 @@ INSIGHT_API enum INSIGHT_WINDOW_FLAGS {
 	RESIZABLE          = INSIGHT_FLAG(4),
 };
 
+typedef void (*Insight_Func)(void* objects, struct window_t* wnd);
+
 /*! Get CPU name. */
-INSIGHT_API char* insight_cpu_info();
+INSIGHT_API char* insight_get_cpu();
 
 /*! Function that initialices only GLFW. */
 INSIGHT_API bool insight_glfw_init();
 
 /*! Function that initialices Insight, GLFW and create a window with the user given functions. */
-INSIGHT_API void insight_engine(void* objects, const char* appname, uint8_t flags);
+INSIGHT_API void insight_init_engine(void* objects, const char* appname, uint8_t flags);
+
+/*! Function that sets the user given pointer into the 'insight_init_ptr' function. See 'insight_init_ptr' for more */
+INSIGHT_API void insight_set_init_func(Insight_Func fn);
+
+/*! Function that sets the user given pointer into the 'insight_update_ptr' function. See 'insight_update_ptr' for more */
+INSIGHT_API void insight_set_update_func(Insight_Func fn);
+
+/*! Function that sets the user given pointer into the 'insight_draw_ptr' function. See 'insight_draw_ptr' for more */
+INSIGHT_API void insight_set_draw_func(Insight_Func fn);
+
+/*! Function that sets the user given pointer into the 'insight_input_ptr' function. See 'insight_input_ptr' for more */
+INSIGHT_API void insight_set_input_func(Insight_Func fn);
+
+/*! Function that sets the user given pointer into the 'insight_terminate_ptr' function. See 'insight_terminate_ptr' for more */
+INSIGHT_API void insight_set_finalize_func(void (*fn)(void*));
 
 /*! Function given by the user to set up variables, behaviour or similar. */
-INSIGHT_API extern void (*insight_init_ptr)(void* objects, window_t* wnd);
+INSIGHT_API extern void (*insight_init_ptr)(void* objects, struct window_t* wnd);
 
 /*! Function given by the user to update variables, behaviour or similar. */
-INSIGHT_API extern void (*insight_update_ptr)(void* objects, window_t* wnd);
-
-/*! Function given by the user that is called, whenever the window is resized. */
-INSIGHT_API extern void (*insight_has_resized_ptr)(void* objects, int new_width, int new_height);
+INSIGHT_API extern void (*insight_update_ptr)(void* objects, struct window_t* wnd);
 
 /*! Function given by the user to draw. */
-INSIGHT_API extern void (*insight_draw_ptr)(void* objects, window_t* wnd);
+INSIGHT_API extern void (*insight_draw_ptr)(void* objects, struct window_t* wnd);
 
 /*! Function given by the user, to handle input. */
-INSIGHT_API extern void (*insight_input_ptr)(void* objects, window_t* wnd);
+INSIGHT_API extern void (*insight_input_ptr)(void* objects, struct window_t* wnd);
 
 /*! Function given by the user, to free memory and end executions. */
-INSIGHT_API extern void (*insight_terminate_ptr)(void* objects);
-
-/*! Pointer. */
-
-#endif /* !_INSIGHT_H_ */
+INSIGHT_API extern void (*insight_finalize_ptr)(void* objects);
 
 /*
  * ==============================================================
@@ -63,17 +73,15 @@ INSIGHT_API extern void (*insight_terminate_ptr)(void* objects);
 
 static char* CPU_INFO;
 
-INSIGHT_API void (*insight_init_ptr)(void*, window_t*) = NULL;
+INSIGHT_API void (*insight_init_ptr)(void*, struct window_t*) = NULL;
 
-INSIGHT_API void (*insight_update_ptr)(void*, window_t*) = NULL;
+INSIGHT_API void (*insight_update_ptr)(void*, struct window_t*) = NULL;
 
-INSIGHT_API void (*insight_has_resized_ptr)(void*, int, int) = NULL;
+INSIGHT_API void (*insight_draw_ptr)(void*, struct window_t*) = NULL;
 
-INSIGHT_API void (*insight_draw_ptr)(void*, window_t*) = NULL;
+INSIGHT_API void (*insight_input_ptr)(void*, struct window_t*) = NULL;
 
-INSIGHT_API void (*insight_input_ptr)(void*, window_t*) = NULL;
-
-INSIGHT_API void (*insight_terminate_ptr)(void*) = NULL;
+INSIGHT_API void (*insight_finalize_ptr)(void*) = NULL;
 
 
 static int window_get_system_info()
@@ -101,7 +109,7 @@ static int window_get_system_info()
 	return CPU_INFO != NULL ? 1 : 0;
 }
 
-INSIGHT_API char* insight_cpu_info()
+INSIGHT_API char* insight_get_cpu()
 {
 	return CPU_INFO;
 }
@@ -111,7 +119,7 @@ INSIGHT_API bool insight_glfw_init()
 	return (!glfwInit() || !window_get_system_info());
 }
 
-INSIGHT_API void insight_engine(void* objects, const char* appname, uint8_t flags)
+INSIGHT_API void insight_init_engine(void* objects, const char* appname, uint8_t flags)
 {
 	if (insight_glfw_init())
 	{
@@ -124,16 +132,11 @@ INSIGHT_API void insight_engine(void* objects, const char* appname, uint8_t flag
 		if_fullscreen = true;
 	}
 
-	__objects = objects;
-
-	window_t* wnd = insight_window_init(WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, appname, if_fullscreen);
-
-
-
+	struct window_t* wnd = window_init(WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, appname, if_fullscreen);
 	if (wnd == NULL)
 	{
 		fprintf(stderr, "[Error]: Cannot create a GLFW window context.");
-		goto terminate;
+		return;
 	}
 
 	/* --- User Init --- */
@@ -142,14 +145,9 @@ INSIGHT_API void insight_engine(void* objects, const char* appname, uint8_t flag
 		insight_init_ptr(objects, wnd);
 	}
 
-	if (insight_has_resized_ptr) 
-	{
-		window_has_resized_ptr = insight_has_resized_ptr;
-	}
-
 	double time = glfwGetTime();
 	printf("Load Time: %f\n", time);
-
+	
 	while (window_is_running(wnd))
 	{
 		if (glfwGetTime() - time > 0.5)
@@ -175,16 +173,42 @@ INSIGHT_API void insight_engine(void* objects, const char* appname, uint8_t flag
 	}
 
 	/* --- User Terminate --- */
-terminate:
-
-	if (insight_terminate_ptr)
+	if (insight_finalize_ptr)
 	{
-		insight_terminate_ptr(objects);
+		insight_finalize_ptr(objects);
 	}
 
-	window_terminate(wnd);
+	window_finalize(wnd);
+}
+
+INSIGHT_API void insight_set_init_func(Insight_Func fn)
+{
+	insight_init_ptr = fn;
+}
+
+INSIGHT_API void insight_set_update_func(Insight_Func fn)
+{
+	insight_update_ptr = fn;
+}
+
+INSIGHT_API void insight_set_draw_func(Insight_Func fn)
+{
+	insight_draw_ptr = fn;
+}
+
+INSIGHT_API void insight_set_input_func(Insight_Func fn)
+{
+	insight_input_ptr = fn;
+}
+
+INSIGHT_API void insight_set_finalize_func(void (*fn)(void*))
+{
+	insight_finalize_ptr = fn;
 }
 
 
 
 #endif /* INSIGHT_INSIGHT_IMPL */
+
+#endif /* !_INSIGHT_H_ */
+
