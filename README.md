@@ -4,7 +4,7 @@ Insight is **lightweight game engine and framework** written in **ANSI C** and l
 ## Features:
 * Lightweight 
 * Use only what you need
-* Written in C89, ANSI C
+* Written in C99
 * Small codebase (~1kLOC)
 * Simple and portable
 * Documentation (In development)
