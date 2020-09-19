@@ -21,7 +21,10 @@ You would need to implement the headers files like this:
 ## Examples
 Insight Init:
 ```c
+#define INSIGHT_INSIGHT_IMPL
+#define INSIGHT_WINDOW_IMPL
 #include "Insight.h"
+#include "Window.h"
 
 int main(void) {
 	if (!INSIGHT_EASY_INIT()) {
@@ -31,7 +34,10 @@ int main(void) {
 	Insight_Window* wnd = insight_window(1280, 720, "Hello, World!!!", INSIGHT_FALSE);
 	assert(wnd);
 	
-	while (insight_window_running(wnd));
+	while (insight_window_running(wnd)) {
+		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(1.0F, 0.0F, 0.0F, 1.0F);
+	}
 	
 	insight_window_finalize(wnd);
 	INSIGHT_EASY_TERMINATE();
