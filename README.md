@@ -23,18 +23,18 @@ Insight Init:
 ```c
 #include "Insight.h"
 
-void draw(void* objects, struct window_t* wnd) { 
+int main(void) {
+	if (!INSIGHT_EASY_INIT()) {
+		return 1;
+	}
 	
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	Insight_Window* wnd = insight_window(1280, 720, "Hello, World!!!", INSIGHT_FALSE);
+	assert(wnd);
 	
-}
-
-int main(void)
-{
-	insight_set_draw_func(draw);
-	insight_init_engine(NULL, "Insight", 0);
-
+	while (insight_window_running(wnd));
+	
+	insight_window_finalize(wnd);
+	INSIGHT_EASY_TERMINATE();
 	return 0;
 }
 ```
