@@ -1,25 +1,43 @@
 #ifndef _SHADER_H_
 #define _SHADER_H_
 
-#include "Core.h"
+#include "Insight.h"
 #include <glad/glad.h>
 
-struct shader_t
-{
-	GLuint id;
-};
+#define DEFAULT_VS\
+	"#version 330 core\n"\
+	"layout(location = 0) in vec3 m_Position;"\
+	"layout(location = 1) in vec2 m_TexCoords;"\
+	"out vec2 TexCoords;\n"\
+	"uniform mat4 MVP;\n"\
+	"void main() {\n"\
+	"TexCoords = m_TexCoords;\n"\
+	"gl_Position = MVP * vec4(m_Position, 1.0);\n"\
+	"}\n"\
+
+#define DEFAULT_FS\
+	"#version 330 core\n"\
+	"in vec2 TexCoords;\n"\
+	"uniform sampler2D Texture;\n"\
+	"void main() {\n"\
+	"gl_FragColor = texture(Texture, TexCoords);\n"\
+	"}\n"\
+
 
 /*! Returns a pointer to a shader object in memory. */
-INSIGHT_API struct shader_t* shader_init(const char* vsPath, const char* fsPath);
+INSIGHT_API unsigned int insight_shader(const char* vsSrc, const char* fsSrc);
+
+/*! Returns a pointer to a shader object in memory. */
+INSIGHT_API unsigned int insight_shader_from_path(const char* vsPath, const char* fsPath);
 
 /*! Binds the given shader, so the user can use it. */
-INSIGHT_API void shader_bind(struct shader_t* self);
+INSIGHT_API void insight_shader_bind(GLuint self);
 
 /*! Unbinds the current binded shader, so it cannot be used anymore. */
-INSIGHT_API void shader_unbind();
+INSIGHT_API void insight_shader_unbind();
 
 /*! Deletes the memory of the given shader. */
-INSIGHT_API void shader_finalize(struct shader_t* self);
+INSIGHT_API void insight_shader_finalize(unsigned int self);
 
 
 /*
@@ -30,9 +48,13 @@ INSIGHT_API void shader_finalize(struct shader_t* self);
  * ===============================================================
  */
 #ifdef INSIGHT_SHADER_IMPL
-GLuint new_shader(GLenum type, const char* src)
+
+#include <stdio.h>
+#include <stdlib.h>
+
+static unsigned int new_shader(GLenum type, const char* src)
 {
-	GLuint shader = glCreateShader(type);
+	unsigned int shader = glCreateShader(type);
 	glShaderSource(shader, 1, &src, NULL);
 	glCompileShader(shader);
 
@@ -55,73 +77,70 @@ GLuint new_shader(GLenum type, const char* src)
 char* read_file(const char* path)
 {
 
-	char* buffer = NULL;
 	long length;
 	FILE* f = NULL;
 	fopen_s(&f, path, "rb"); /* was "rb" */
-	assert(f != NULL);
-
-	if (f)
+	if (f == NULL) 
 	{
-		fseek(f, 0, SEEK_END);
-		length = ftell(f);
-		fseek(f, 0, SEEK_SET);
-		buffer = (char*)malloc((length + 1) * sizeof(char));
-		if (buffer)
-		{
-			fread(buffer, sizeof(char), length, f);
-		}
+		fprintf(stderr, "[Error]: Cannot allocate memory for new shader.\n");
+		exit(-1);
+	}
 
-		fclose(f);
-	}
-	else
+	fseek(f, 0, SEEK_END);
+	length = ftell(f);
+	fseek(f, 0, SEEK_SET);
+	char* buffer = (char*)malloc((length + 1) * sizeof(char));
+	if (buffer)
 	{
-		fprintf(stderr, "Error: cannot load given file: '%s'\n", path);
-		return NULL;
+		fread(buffer, sizeof(char), length, f);
 	}
+
+	fclose(f);
+
 	buffer[length] = '\0';
 
 	return buffer;
 }
 
 
-INSIGHT_API struct shader_t* shader_init(const char* vsPath, const char* fsPath)
+INSIGHT_API unsigned int insight_shader(const char* vsSrc, const char* fsSrc)
 {
-	struct shader_t* self = (struct shader_t*)malloc(sizeof(struct shader_t));
-	assert(self);
+	unsigned int shader = glCreateProgram();
 
-	self->id = glCreateProgram();
+	unsigned int vs = new_shader(GL_VERTEX_SHADER, vsSrc);
+	unsigned int fs = new_shader(GL_FRAGMENT_SHADER, fsSrc);
 
-	GLuint vs = new_shader(GL_VERTEX_SHADER, read_file(vsPath));
-	GLuint fs = new_shader(GL_FRAGMENT_SHADER, read_file(fsPath));
+	glAttachShader(shader, vs);
+	glAttachShader(shader, fs);
+	glLinkProgram(shader);
+	glValidateProgram(shader);
 
-	glAttachShader(self->id, vs);
-	glAttachShader(self->id, fs);
-	glLinkProgram(self->id);
-	glValidateProgram(self->id);
-
-	glDetachShader(self->id, vs);
-	glDetachShader(self->id, fs);
+	glDetachShader(shader, vs);
+	glDetachShader(shader, fs);
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 
-	return self;
+	return shader;
 }
 
-INSIGHT_API void shader_bind(struct shader_t* self)
+INSIGHT_API unsigned int insight_shader_from_path(const char* vsPath, const char* fsPath)
 {
-	glUseProgram(self->id);
+	return insight_shader(read_file(vsPath), read_file(fsPath));
 }
 
-INSIGHT_API void shader_unbind()
+INSIGHT_API void insight_shader_bind(GLuint self)
+{
+	glUseProgram(self);
+}
+
+INSIGHT_API void insight_shader_unbind()
 {
 	glUseProgram(0);
 }
 
-INSIGHT_API void shader_finalize(struct shader_t* self)
+INSIGHT_API void insight_shader_finalize(unsigned int self)
 {
-	glDeleteProgram(self->id);
-	free(self);
+	glDeleteProgram(self);
 }
 
 #endif /* INSIGHT_SHADER_IMPL */

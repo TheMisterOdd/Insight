@@ -6,14 +6,14 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "Input.h"
 
-#define WINDOW_DEFAULT_WIDTH 1280
-#define WINDOW_DEFAULT_HEIGHT 720
+#define WINDOW_DEFAULT_WIDTH 854
+#define WINDOW_DEFAULT_HEIGHT 480
 
-struct window_t
-{
+typedef struct {
 	/*! The width, in screen coordinates. */
 	int width;
 
@@ -26,7 +26,7 @@ struct window_t
 	double deltaTime, lastTime;
 
 	/*! Mouse, keyboard and controller handeler. */
-	input_t* input;
+	Insight_Input* input;
 
 	/*! Window object. */
 	GLFWwindow* wnd_hndl;
@@ -34,21 +34,29 @@ struct window_t
 	/*! Video mode type. */
 	const GLFWvidmode* vidMode;
 
-};
+} Insight_Window;
+
+#define INSIGHT_TRUE  1
+#define INSIGHT_FALSE 0
 
 /*! Returns a pointer to a window in memory */
-INSIGHT_API struct window_t* window_init(int width, int height, const char* title, bool fullscreen);
+INSIGHT_API Insight_Window* insight_window(int width, int height, const char* title, int fullscreen);
 
 /*! Checks if the window is running or not */
-INSIGHT_API bool window_is_running(struct window_t* self);
+INSIGHT_API int insight_window_running(Insight_Window* self);
 
 /*! Sets new size of the window */
-INSIGHT_API void window_set_size(struct window_t* self, int width, int height);
+INSIGHT_API void insight_window_size(Insight_Window* self, int width, int height);
+
+/*! Sets if the window should close or not */
+INSIGHT_API void insight_set_window_should_close(Insight_Window* self, int value);
 
 /*! The memory of the window is freed */
-INSIGHT_API void window_finalize(struct window_t* self);
+INSIGHT_API void insight_window_finalize(Insight_Window* self);
 
-INSIGHT_API bool window_has_resized;
+
+
+INSIGHT_API int window_has_resized;
 /*
  * ==============================================================
  *
@@ -58,24 +66,23 @@ INSIGHT_API bool window_has_resized;
  */
 #ifdef INSIGHT_WINDOW_IMPL
 
-static void window_resize_callback(GLFWwindow* window, int fbW, int fbH)
-{
+#include <stdio.h>
+#include <malloc.h>
+
+static void window_resize_callback(GLFWwindow* window, int fbW, int fbH) {
 	glViewport(0, 0, fbW, fbH);
 	window_has_resized = true;
 }
 
-static void window_error_callback(int err, const char* description)
-{
+static void window_error_callback(int err, const char* description) {
 	fprintf(stderr, "Error: %d: %s\n", err, description);
 }
 
 
-INSIGHT_API struct window_t* window_init(int width, int height, const char* title, bool fullscreen)
-{
-	struct window_t* self = (struct window_t*)malloc(sizeof(struct window_t));
-	if (self == NULL)
-	{
-		fprintf(stderr, "[Error]: 'Insight_Window*', cannot be 'NULL'. File: %s:%d\n", __FILE__, __LINE__);
+INSIGHT_API Insight_Window* insight_window(int width, int height, const char* title, int fullscreen) {
+	Insight_Window* self = (Insight_Window*)malloc(sizeof(Insight_Window));
+	if (self == NULL) {
+		fprintf(stderr, "[Error]: malloc() failed to alloc window. File: %s:%d\n", __FILE__, __LINE__);
 		return NULL;
 	}
 
@@ -91,8 +98,7 @@ INSIGHT_API struct window_t* window_init(int width, int height, const char* titl
 
 
 	self->wnd_hndl = glfwCreateWindow(width, height, title, fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL);
-	if (self->wnd_hndl == NULL)
-	{
+	if (self->wnd_hndl == NULL) {
 		fprintf(stderr, "[Error]: Cannot create a GLFW window context.");
 		return NULL;
 	}
@@ -101,23 +107,18 @@ INSIGHT_API struct window_t* window_init(int width, int height, const char* titl
 	glfwSetFramebufferSizeCallback(self->wnd_hndl, window_resize_callback);
 	glfwSetErrorCallback(window_error_callback);
 
-	self->input = Input(self->wnd_hndl);
+
+	self->input = insight_mkinput(self->wnd_hndl);
 
 	glfwMakeContextCurrent(self->wnd_hndl);
 
-	if (!gladLoadGL())
-	{
+	if (!gladLoadGL()) {
 		fprintf(stderr, "Could not create a OpenGL context\n");
 		return NULL;
 	}
 
 	/* OpenGL Related: */
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glEnable(GL_DEPTH_TEST);
-
-
+#ifdef _DEBUG
 	printf(
 		"OpenGL %s\nGLFW %s\n%s\n%s\n",
 		glGetString(GL_VERSION),
@@ -125,17 +126,16 @@ INSIGHT_API struct window_t* window_init(int width, int height, const char* titl
 		glGetString(GL_RENDERER),
 		glGetString(GL_VENDOR)
 	);
-
+#endif
 	return self;
 }
 
-INSIGHT_API bool window_is_running(struct window_t* self)
-{
+INSIGHT_API int insight_window_running(Insight_Window* self) {
 	double currentTime = glfwGetTime();
 	self->deltaTime = currentTime - self->lastTime;
 	self->lastTime = currentTime;
 
-	Input_Update(self->input);
+	insight_inputupdate(self->input);
 
 	glFlush();
 	glfwSwapBuffers(self->wnd_hndl);
@@ -145,20 +145,22 @@ INSIGHT_API bool window_is_running(struct window_t* self)
 	return !glfwWindowShouldClose(self->wnd_hndl);
 }
 
-INSIGHT_API void window_set_size(struct window_t* self, int width, int height)
-{
+INSIGHT_API void insight_window_size(Insight_Window* self, int width, int height) {
 	glfwSetWindowSize(self->wnd_hndl, width, height);
 	glfwSetWindowPos(self->wnd_hndl, (self->vidMode->width - width) / 2, (self->vidMode->height - height) / 2);
 }
 
-INSIGHT_API void window_finalize(struct window_t* self)
-{
-	Input_Finalize(self->input);
+INSIGHT_API void insight_set_window_should_close(Insight_Window* self, int value) {
+	glfwSetWindowShouldClose(self->wnd_hndl, value);
+}
+
+INSIGHT_API void insight_window_finalize(Insight_Window* self) {
+	insight_inputfinalize(self->input);
 	glfwDestroyWindow(self->wnd_hndl);
+	free(self);
 }
 
 
 #endif /* !INSIGHT_WINDOW_IMPL */
 
 #endif /* !_WINDOW_H_ */
-

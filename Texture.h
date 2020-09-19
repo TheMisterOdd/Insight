@@ -1,42 +1,44 @@
 #ifndef _TEXTURE_H_
 #define _TEXTURE_H_
 
-#include "Core.h"
-
 #include <glad/glad.h>
 #include <stdbool.h>
 #include <time.h>
 
+#include "Insight.h"
+
 /*! Texture type. */
-struct texture_t
-{
-	int width, height, channels;
-	unsigned int texture;
-};
+typedef uint32_t Insight_Texture[4];
 
 /*! Returns a pointer to a texture object in memory. */
-INSIGHT_API struct texture_t* texture_init(const char* path);
+INSIGHT_API void insight_texture2d(Insight_Texture self, const char* path);
+
+/*! Returns a pointer to a texture object in memory. */
+INSIGHT_API void insight_texture2d_from_bytes(Insight_Texture self, unsigned char* raw_data, int width, int height);
 
 /*! Returns a pointer to a texture object for a skybox in memory. */
-INSIGHT_API struct texture_t* texture_skybox_init(char** faces_files, unsigned int lenght);
+INSIGHT_API void insight_skybox(Insight_Texture self, char** faces_files, unsigned int lenght);
 
 /*! Uses the given texture, for handeling it. */
-INSIGHT_API void texture_bind(struct texture_t* self, unsigned int sampler);
+INSIGHT_API void insight_texture_bind(Insight_Texture self, unsigned int sampler);
 
 /*! Stop using the current binded texture. */
-INSIGHT_API void texture_unbind();
+INSIGHT_API void insight_texture_unbind();
+
+/*! Copies the current texture into another */
+INSIGHT_API void insight_texture_copy(Insight_Texture dest, Insight_Texture src);
 
 /*! Delete the memory of the given texture. */
-INSIGHT_API void texture_finalize(struct texture_t* self);
+INSIGHT_API void insight_texture_finalize(Insight_Texture self);
 
 /*! Makes a screenshot an writes it into a png file. */
-INSIGHT_API bool texture_make_screenshot();
+INSIGHT_API int insight_screenshot();
 
 /*! Sets window cursor */
-INSIGHT_API GLFWcursor* texture_set_window_cursor(struct window_t* self, const char* path);
+INSIGHT_API GLFWcursor* insight_set_cursor(Insight_Window* self, const char* path);
 
 /*! Sets window icon */
-INSIGHT_API void texture_set_window_icon(struct window_t* self, const char* path);
+INSIGHT_API void insight_set_window_icon(Insight_Window* self, const char* path);
 
 
 /*
@@ -54,26 +56,26 @@ INSIGHT_API void texture_set_window_icon(struct window_t* self, const char* path
 #include <stb_image.h>
 #include <stb_image_write.h>
 
-INSIGHT_API struct texture_t* texture_init(const char* path)
+INSIGHT_API void insight_texture2d(Insight_Texture self, const char* path)
 {
+#ifdef _DEBUG
 	printf("Loading new texture '%s'...\n", path);
-	struct texture_t* self = (struct texture_t*)malloc(sizeof(struct texture_t));
-	assert(self);
+#endif
 
-	glGenTextures(1, &self->texture);
+	glGenTextures(1, &self[3]);
 
 	stbi_set_flip_vertically_on_load(1);
-	unsigned char* img = stbi_load(path, &self->width, &self->height, &self->channels, STBI_rgb_alpha);
+	unsigned char* img = stbi_load(path, (int*)&self[0], (int*)&self[1], (int*)&self[2], STBI_rgb_alpha);
 	stbi_set_flip_vertically_on_load(0);
-
+	
 	if (!img)
 	{
 		fprintf(stderr, "[Error]: Cannot load given file '%s'\n", path);
-		return NULL;
+		return;
 	}
 
-	glBindTexture(GL_TEXTURE_2D, self->texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self->width, self->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
+	glBindTexture(GL_TEXTURE_2D, self[3]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, (int)self[0], (int)self[1], 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -83,32 +85,51 @@ INSIGHT_API struct texture_t* texture_init(const char* path)
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(img);
-
-	return self;
 }
 
-INSIGHT_API struct texture_t* texture_skybox_init(char** faces_files, unsigned int lenght)
+INSIGHT_API void insight_texture2d_from_bytes(Insight_Texture self, unsigned char* raw_data, int width, int height)
+{
+	self[0] = width;
+	self[1] = height;
+	glGenTextures(1, &self[3]);
+
+	if (!raw_data)
+	{
+		fprintf(stderr, "[Error]: Cannot load given texture\n");
+		return;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, self[3]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, (int)self[0], (int)self[1], 0, GL_RGBA, GL_UNSIGNED_BYTE, raw_data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+INSIGHT_API void insight_skybox(Insight_Texture self, char** faces_files, unsigned int lenght)
 {
 	printf("Loading new skybox texture...\n");
-	struct texture_t* self = (struct texture_t*)malloc(sizeof(struct texture_t));
-	assert(self);
-
 	unsigned char* img = NULL;
 
-	glGenTextures(1, &self->texture);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, self->texture);
+	glGenTextures(1, &self[3]);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, self[3]);
 
 	unsigned int i;
 	for (i = 0; i < lenght; i++)
 	{
-		img = stbi_load(faces_files[i], &self->width, &self->height, &self->channels, STBI_rgb);
+		img = stbi_load(faces_files[i], (int*)&self[0], (int*)&self[1], (int*)&self[2], STBI_rgb);
 		if (!img)
 		{
 			fprintf(stderr, "[Error]: Cannot load given file '%s'\n", faces_files[i]);
-			return NULL;
+			return;
 		}
 
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, self->width, self->height, 0, GL_RGB, GL_UNSIGNED_BYTE, img);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, (int)self[0], (int)self[1], 0, GL_RGB, GL_UNSIGNED_BYTE, img);
 		stbi_image_free(img);
 	}
 
@@ -118,32 +139,33 @@ INSIGHT_API struct texture_t* texture_skybox_init(char** faces_files, unsigned i
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
-	return self;
 }
 
-INSIGHT_API void texture_bind(struct texture_t* self, unsigned int sampler)
+INSIGHT_API void insight_texture_bind(Insight_Texture self, unsigned int sampler)
 {
 	glActiveTexture(GL_TEXTURE0 + sampler);
-	glBindTexture(GL_TEXTURE_2D, self->texture);
+	glBindTexture(GL_TEXTURE_2D, self[3]);
 }
 
-INSIGHT_API void texture_unbind()
+INSIGHT_API void insight_texture_unbind()
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-INSIGHT_API void texture_finalize(struct texture_t* self)
+INSIGHT_API void insight_texture_copy(Insight_Texture dest, Insight_Texture src)
 {
-	glDeleteTextures(1, &self->texture);
-	self->channels = 0;
-	self->width = 0;
-	self->height = 0;
-
-	free(self);
+	dest[0] = src[0];
+	dest[1] = src[1];
+	dest[2] = src[2];
+	dest[3] = src[3];
 }
 
-INSIGHT_API bool texture_make_screenshot()
+INSIGHT_API void insight_texture_finalize(Insight_Texture self)
+{
+	glDeleteTextures(1, &self[3]);
+}
+
+INSIGHT_API int insight_screenshot()
 {
 	time_t t = time(NULL);
 	struct tm tm;
@@ -178,7 +200,7 @@ INSIGHT_API bool texture_make_screenshot()
 	return saved;
 }
 
-INSIGHT_API GLFWcursor* texture_set_window_cursor(struct window_t* self, const char* path)
+INSIGHT_API GLFWcursor* insight_set_cursor(Insight_Window* self, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
@@ -190,7 +212,7 @@ INSIGHT_API GLFWcursor* texture_set_window_cursor(struct window_t* self, const c
 	return cursor;
 }
 
-INSIGHT_API void texture_set_window_icon(struct window_t* self, const char* path)
+INSIGHT_API void insight_set_window_icon(Insight_Window* self, const char* path)
 {
 	GLFWimage* image = (GLFWimage*)malloc(sizeof(GLFWimage));
 	image[0].pixels = stbi_load(path, &image[0].width, &image[0].height, NULL, STBI_rgb_alpha);
