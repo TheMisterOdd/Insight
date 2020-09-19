@@ -41,7 +41,7 @@ int main(void)
 ### Output
 <img width="854" height="480" src="https://raw.githubusercontent.com/AlKiam/Insight3D/master/image/image-1.png" alt="window output"/>
 
-## Dependencies
+## Dependencies and Suggestions:
   * **GLFW** https://www.glfw.org/
   * **OpenGL** https://glad.dav1d.de/ or http://glew.sourceforge.net/
   * **stb_image** https://github.com/nothings/stb/blob/master/stb_image.h
