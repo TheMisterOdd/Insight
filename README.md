@@ -1,5 +1,5 @@
 # Insight
-Insight is **lightweight game engine and framework** written in **C99** and licensed under public domain. The engine is designed to be fast and could be used in any project and, also, it could be easily implemented with C++. The only dependecies it needs are an OpenGL library and `stb_image` and `stb_image_write header` files.
+Insight is **lightweight, data oriented game engine and framework** written in **C99** and licensed under public domain. The engine is designed to be fast and could be used in any project and, also, it could be easily implemented with C++. The only dependecies it needs are an OpenGL library and `stb_image` and `stb_image_write header` files.
 
 ## Features:
 * Lightweight 
