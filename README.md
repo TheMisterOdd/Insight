@@ -30,7 +30,7 @@ Insight Init:
 
 int main(void) {
 	if (!INSIGHT_EASY_INIT()) {
-		return 1;
+		return -1;
 	}
 	
 	Insight_Window* wnd = insight_window(1280, 720, "Hello, World!!!", INSIGHT_FALSE);
